@@ -38,3 +38,4 @@
 .\objects\main.o: .\System\Timer.h
 .\objects\main.o: .\System\MyRTC.h
 .\objects\main.o: .\Hardware\HC_SR04.h
+.\objects\main.o: .\System\Count_Down.h

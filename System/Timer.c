@@ -8,11 +8,11 @@
 
 extern volatile uint8_t Working;
 extern volatile uint8_t Gear;
+extern volatile uint8_t Last_Gear;
 extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
 volatile uint8_t IsSafe = 1;
 float current_dist;
-uint8_t volatile Last_Gear;
 
 void Timer_Init(void){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);

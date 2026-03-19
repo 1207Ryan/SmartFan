@@ -8,7 +8,9 @@
 #include "MyRTC.h"
 #include "AD.h"
 #include "HC_SR04.h"
+#include "Count_Down.h"
 #include "Timer.h"
+
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -17,21 +19,24 @@ uint8_t CurrState = 0;
 
 volatile uint8_t Working = 0;
 volatile uint8_t Gear;
+volatile uint8_t Last_Gear;
 volatile float Temp;
 volatile uint8_t Temp2Gear = 0;
 extern volatile uint8_t IsSafe;
+extern uint32_t cnt;
+extern uint8_t Count_Started;
 
 uint8_t Menu1(void){
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
-			if(CurrSelect1>=1 && CurrSelect1<=4){
+			if(CurrSelect1 >= 1 && CurrSelect1 <= 4){
 				OLED_ShowString(0, 0,  "温度调节档位          	", OLED_8X16);
 				OLED_ShowString(0, 16, "风扇档位控制          	", OLED_8X16);
 				OLED_ShowString(0, 32, "倒计时               	", OLED_8X16);
 				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
-			else if(CurrSelect1 >=5 && CurrSelect1<=6 ){
+			else if(CurrSelect1 >=5 && CurrSelect1 <= 6){
 				OLED_ShowString(0, 0,  "调试             ", OLED_8X16);
 				OLED_ShowString(0, 16, "设置             ", OLED_8X16);
 				OLED_ShowString(0, 32, "                ", OLED_8X16);
@@ -274,24 +279,39 @@ void Menu2_CountDown(void){
 			OLED_Clear();
 			
 			if(CurrSelect2>=1 && CurrSelect2<=3){
-				OLED_ShowString(0, 0,  " <-             ", OLED_8X16);
-				OLED_ShowString(0, 16, "开始倒计时         ", OLED_8X16);
-				OLED_ShowString(0, 32, "停止倒计时          ", OLED_8X16);
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "设置倒计时         ", OLED_8X16);
+				OLED_ShowString(0, 32, "    倒计时          ", OLED_8X16);
 				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
 			}
+			OLED_ShowChar(72, 48, 'h', OLED_8X16);
+			OLED_ShowChar(96, 48, 'm', OLED_8X16);
+			OLED_ShowChar(120, 48, 's', OLED_8X16);
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
 			OLED_Update();
 			CurrState = 1;
 		}else{
-//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-//			OLED_ClearArea(0, 16, 32, 16);
-//			
-//			OLED_ShowNum(88, 32, MyRTC_Time.Second, 2, OLED_8X16);
-
-//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-//			OLED_UpdateArea(0, 16, 32, 16);
-			
-		}
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+				OLED_ClearArea(0, 32, 32, 16);
+				OLED_ClearArea(56, 48, 16, 16);
+				OLED_ClearArea(80, 48, 16, 16);
+				OLED_ClearArea(104, 48, 16, 16);
+				
+				OLED_ShowNum(56, 48, Get_Count()/3600, 2, OLED_8X16);
+				OLED_ShowNum(80, 48, Get_Count()%3600/60, 2, OLED_8X16);
+				OLED_ShowNum(104, 48, Get_Count()%3600%60, 2, OLED_8X16);
+				if(!Count_Started)
+					OLED_ShowString(0, 32, "开始", OLED_8X16);
+				else
+					OLED_ShowString(0, 32, "停止", OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+				OLED_UpdateArea(0, 32, 32, 16);
+				OLED_UpdateArea(56, 48, 16, 16);
+				OLED_UpdateArea(80, 48, 16, 16);
+				OLED_UpdateArea(104, 48, 16, 16);
+				
+			}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
@@ -318,6 +338,15 @@ void Menu2_CountDown(void){
 				return;
 			case 2:
 				Menu2_Select = 0;
+				CurrState = 0;
+				Menu3_CountDown();
+				break;
+			case 3:
+				Menu2_Select = 0;
+				if(!Count_Started)
+					Count_Start();
+				else
+					Count_Stop();
 				break;
 		}
 	}
@@ -329,67 +358,109 @@ void Menu2_CountDown(void){
   * @retval 无
   */
 void Menu3_CountDown(void){
-	uint8_t Menu2_Select = 0;
+	uint8_t Menu3_Select = 0;
 	
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
 			
-			if(CurrSelect2>=1 && CurrSelect2<=3){
-				OLED_ShowString(0, 0, " <-                ", OLED_8X16);
+			if(CurrSelect3>=1 && CurrSelect3<=3){
+				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1秒钟            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1秒钟            ", OLED_8X16);
-				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
-			}else if(CurrSelect2>=4 && CurrSelect2<=6){
+			}else if(CurrSelect3>=4 && CurrSelect3<=6){
 				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1分钟            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1分钟            ", OLED_8X16);
-				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
-			}else if(CurrSelect2>=7 && CurrSelect2<=9){
+			}else if(CurrSelect3>=7 && CurrSelect3<=9){
 				OLED_ShowString(0, 0,  "<-             	  ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1小时            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1小时            ", OLED_8X16);
-				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
 			}
-			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
+			OLED_ShowChar(72, 48, 'h', OLED_8X16);
+			OLED_ShowChar(96, 48, 'm', OLED_8X16);
+			OLED_ShowChar(120, 48, 's', OLED_8X16);
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%48, 128, 16);
 			OLED_Update();
 			CurrState = 1;
 		}else{
-//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-//			OLED_ClearArea(0, 16, 32, 16);
-//			
-//			OLED_ShowNum(88, 32, MyRTC_Time.Second, 2, OLED_8X16);
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_ClearArea(56, 48, 16, 16);
+			OLED_ClearArea(80, 48, 16, 16);
+			OLED_ClearArea(104, 48, 16, 16);
+			
+			OLED_ShowNum(56, 48, Get_Count()/3600, 2, OLED_8X16);
+			OLED_ShowNum(80, 48, Get_Count()%3600/60, 2, OLED_8X16);
+			OLED_ShowNum(104, 48, Get_Count()%3600%60, 2, OLED_8X16);
 
-//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-//			OLED_UpdateArea(0, 16, 32, 16);
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_UpdateArea(56, 48, 16, 16);
+			OLED_UpdateArea(80, 48, 16, 16);
+			OLED_UpdateArea(104, 48, 16, 16);
 			
 		}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
-			CurrSelect2--;
-			if(CurrSelect2 <= 0){
-				CurrSelect2 = 9;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 9;
 			}
 		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
-			CurrSelect2++;
-			if(CurrSelect2 > 9){
-				CurrSelect2 = 1;
+			CurrSelect3++;
+			if(CurrSelect3 > 9){
+				CurrSelect3 = 1;
 			}
 		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_Clear();
 			OLED_Update();
-			Menu2_Select = CurrSelect2;
+			Menu3_Select = CurrSelect3;
+		}else if(Key_Check(KEY_3, KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
 		}
 		
-		switch(Menu2_Select){
+		switch(Menu3_Select){
 			case 1:
-				Menu2_Select = 0;
+				CurrSelect3 = 0;
+				Menu3_Select = 0;
 				return;
 			case 2:
-				Menu2_Select = 0;
+				Menu3_Select = 0;
+				Count_Add_1s();
+				break;
+			case 3:
+				Menu3_Select = 0;
+				Count_Sub_1s();
+				break;
+			case 4:
+				CurrSelect3 = 0;
+				Menu3_Select = 0;
+				return;
+			case 5:
+				Menu3_Select = 0;
+				Count_Add_1m();
+				break;
+			case 6:
+				Menu3_Select = 0;
+				Count_Sub_1m();
+				break;
+			case 7:
+				CurrSelect3 = 0;
+				Menu3_Select = 0;
+				return;
+			case 8:
+				Menu3_Select = 0;
+				Count_Add_1h();
+				break;
+			case 9:
+				Menu3_Select = 0;
+				Count_Sub_1h();
 				break;
 		}
 	}

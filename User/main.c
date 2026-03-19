@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "MyRTC.h"
 #include "HC_SR04.h"
+#include "Count_Down.h"
 
 int main(void)
 {
@@ -19,6 +20,7 @@ int main(void)
 	Timer_Init();
 	MyRTC_Init();
 	HC_SR04_Init();
+	Count_Down_Init();
 	
 	uint8_t Menu1_Select;
 	

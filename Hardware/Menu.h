@@ -20,5 +20,6 @@ void Menu2_CountDown(void);
 void Menu2_Clock(void);
 void Menu2_Debug(void);
 
+void Menu3_CountDown(void);
 
 #endif
