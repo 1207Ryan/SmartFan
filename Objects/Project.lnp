@@ -8,6 +8,7 @@
 ".\objects\menu.o"
 ".\objects\ad.o"
 ".\objects\hc_sr04.o"
+".\objects\count_down.o"
 ".\objects\delay.o"
 ".\objects\myrtc.o"
 ".\objects\timer.o"

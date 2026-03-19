@@ -33,9 +33,10 @@ int main(void)
 				Menu2_Fan();
 				break;
 			case 3:
-				Menu2_Clock();
+				Menu2_CountDown();
 				break;
 			case 4:
+				Menu2_Clock();
 				break;
 			case 5:
 				Menu2_Debug();

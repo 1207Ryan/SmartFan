@@ -10,6 +10,7 @@
 
 void Motor_Init(void);
 void Motor_SetSpeed(int8_t speed);
+void Motor_SetGear(int8_t Gear);
 void Motor_Stop(void);
 
 #endif

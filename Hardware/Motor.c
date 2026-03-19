@@ -26,6 +26,10 @@ void Motor_SetSpeed(int8_t Speed){
 	}
 }
 
+void Motor_SetGear(int8_t Gear){
+	Motor_SetSpeed(Gear * 20);
+}
+
 void Motor_Stop(void){
 	GPIO_SetBits(GPIOA, GPIO_Pin_4);
 	GPIO_ResetBits(GPIOA, GPIO_Pin_5);

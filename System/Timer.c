@@ -6,6 +6,7 @@
 #include "HC_SR04.h"
 #include "Motor.h"
 
+extern volatile uint8_t Working;
 extern volatile uint8_t Gear;
 extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
@@ -65,22 +66,12 @@ void Temp_Match_Gear(void){
 		}
 		
 		if(Gear != Last_Gear){
-			if(Gear == 1) 
-				Motor_SetSpeed(MOTOR_SPEED_1);
-			else if(Gear == 2) 
-				Motor_SetSpeed(MOTOR_SPEED_2);
-			else if(Gear == 3) 
-				Motor_SetSpeed(MOTOR_SPEED_3);
-			else if(Gear == 4) 
-				Motor_SetSpeed(MOTOR_SPEED_4);
-			else if(Gear == 5) 
-				Motor_SetSpeed(MOTOR_SPEED_5);
-			else Motor_SetSpeed(0);
+			Motor_SetGear(Gear);
 
 			Last_Gear = Gear; // 更新旧档位
 		}
 	}else{
-		Motor_SetSpeed(MOTOR_SPEED_0);
+		Motor_Stop();
 	}
 }
 
@@ -102,7 +93,7 @@ void TIM3_IRQHandler(void){
 			Temp_Match_Gear();
 		}
 		
-		if(refresh_tick % 200 == 0){
+		if(Working && refresh_tick % 200 == 0){
 			//200ms测量一次距离
 			current_dist = HC_SR04_GetDistance();
 			if(current_dist < SATE_DISTANCE){
@@ -110,14 +101,14 @@ void TIM3_IRQHandler(void){
 				if(Gear > 0){
 					Last_Gear = Gear;
 					Gear = 0;
-					Motor_SetSpeed(MOTOR_SPEED_0);
+					Motor_Stop();
 				}
 			}else{
 				IsSafe = 1;
 				if(Gear == 0){
 					Gear = Last_Gear;
 					Last_Gear = 0;
-					Motor_SetSpeed(Gear * 20);
+					Motor_SetGear(Gear);
 				}
 			}
 		}

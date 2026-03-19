@@ -10,8 +10,6 @@
 #define VCC          3.3f      // 供电电压
 #define WINDOW_SIZE  8         // 滑动窗口长度（建议8-12，越小响应越快）
 
-
-extern volatile uint8_t Gear;
 uint16_t AD_Value;			  	//定义用于存放AD转换结果的全局数组
 float Temp_Value = 0.0f;      	// 转换后的温度值（单位：℃）
 uint8_t AD_Collect_Status = 0;	// 采集状态：0=关闭，1=开启
@@ -31,20 +29,20 @@ void AD_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);	//开启ADC1的时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	//开启GPIOA的时钟
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);		//开启DMA1的时钟
-	
+
 	/*设置ADC时钟*/
 	RCC_ADCCLKConfig(RCC_PCLK2_Div6);						//选择时钟6分频，ADCCLK = 72MHz / 6 = 12MHz
-	
+
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);					//将PA1引脚初始化为模拟输入
-	
+
 	/*规则组通道配置*/
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 1, ADC_SampleTime_55Cycles5);	//规则组序列1的位置，配置为通道0
-	
+
 	/*ADC初始化*/
 	ADC_InitTypeDef ADC_InitStructure;											//定义结构体变量
 	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;							//模式，选择独立模式，即单独使用ADC1
@@ -54,7 +52,7 @@ void AD_Init(void)
 	ADC_InitStructure.ADC_ScanConvMode = DISABLE;								//扫描模式，失能
 	ADC_InitStructure.ADC_NbrOfChannel = 1;										//通道数，为1，扫描规则组的1个通道
 	ADC_Init(ADC1, &ADC_InitStructure);											//将结构体变量交给ADC_Init，配置ADC1
-	
+
 	/*DMA初始化*/
 	DMA_InitTypeDef DMA_InitStructure;											//定义结构体变量
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;				//外设基地址，给定形参AddrA
@@ -69,12 +67,12 @@ void AD_Init(void)
 	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;								//存储器到存储器，选择失能，数据由ADC外设触发转运到存储器
 	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;						//优先级，选择中等
 	DMA_Init(DMA1_Channel1, &DMA_InitStructure);								//将结构体变量交给DMA_Init，配置DMA1的通道1
-	
+
 	/*DMA和ADC使能*/
 	DMA_Cmd(DMA1_Channel1, DISABLE);							//DMA1的通道1失能
 	ADC_DMACmd(ADC1, DISABLE);								//ADC1触发DMA1的信号失能
 	ADC_Cmd(ADC1, DISABLE);									//ADC1失能
-	
+
 	/*ADC校准*/
 	ADC_ResetCalibration(ADC1);								//固定流程，内部有电路会自动执行校准
 	uint16_t timeout = 100;
@@ -85,7 +83,7 @@ void AD_Init(void)
 	}
 	ADC_StartCalibration(ADC1);
 	while (ADC_GetCalibrationStatus(ADC1) == SET);
-	
+
 	/*ADC触发*/
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);	
 }

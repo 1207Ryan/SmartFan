@@ -14,8 +14,9 @@ uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
 uint8_t CurrSelect3 = 1;
 uint8_t CurrState = 0;
-volatile uint8_t Gear;
 
+volatile uint8_t Working = 0;
+volatile uint8_t Gear;
 volatile float Temp;
 volatile uint8_t Temp2Gear = 0;
 extern volatile uint8_t IsSafe;
@@ -25,14 +26,14 @@ uint8_t Menu1(void){
 		if(CurrState == 0){
 			OLED_Clear();
 			if(CurrSelect1>=1 && CurrSelect1<=4){
-				OLED_ShowString(0, 0,  "温度调节档位          ", OLED_8X16);
-				OLED_ShowString(0, 16, "风扇档位控制          ", OLED_8X16);
-				OLED_ShowString(0, 32, "时间显示             ", OLED_8X16);
-				OLED_ShowString(0, 48, "设置                ", OLED_8X16);
+				OLED_ShowString(0, 0,  "温度调节档位          	", OLED_8X16);
+				OLED_ShowString(0, 16, "风扇档位控制          	", OLED_8X16);
+				OLED_ShowString(0, 32, "倒计时               	", OLED_8X16);
+				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
-			else if(CurrSelect1 == 5 ){
+			else if(CurrSelect1 >=5 && CurrSelect1<=6 ){
 				OLED_ShowString(0, 0,  "调试             ", OLED_8X16);
-				OLED_ShowString(0, 16, "                ", OLED_8X16);
+				OLED_ShowString(0, 16, "设置             ", OLED_8X16);
 				OLED_ShowString(0, 32, "                ", OLED_8X16);
 				OLED_ShowString(0, 48, "                ", OLED_8X16);
 			}
@@ -133,15 +134,16 @@ void Menu2_Temp(){
 			case 1:
 				Menu2_Select = 0;
 				return;
-				break;
 			case 2:		//启动温度调节档位
 				AD_Collect_Start();
+				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
 				Menu2_Select = 0;
 				break;
 			case 3:		//停止风扇
 				AD_Collect_Stop();
+				Working = 0;
 				Temp = 0;
 				Temp2Gear = 0;
 				Gear = 0;
@@ -222,30 +224,171 @@ void Menu2_Fan(void){
 		
 		switch(Menu2_Select){
 			case 1:
-				return;
 				Menu2_Select = 0;
-				break;
+				return;
 			case 2:		//升档
 				Temp2Gear = 0;
+				Working = 1;
+				AD_Collect_Stop();
 				if(Gear < 5){
 					Gear++;
 				}
-				Motor_SetSpeed(Gear * 20);
+				Last_Gear = Gear;
+				Motor_SetGear(Gear);
 				Menu2_Select = 0;
 				break;
 			case 3:		//降档
 				Temp2Gear = 0;
+				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
 				}
-				Motor_SetSpeed(Gear * 20);
+				Last_Gear = Gear;
+				Motor_SetGear(Gear);
+				if(Gear == 0) Working = 0;
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
 				Temp2Gear = 0;
+				AD_Collect_Stop();
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
+				Working = 1;
+				Menu2_Select = 0;
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 倒计时二级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu2_CountDown(void){
+	uint8_t Menu2_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			
+			if(CurrSelect2>=1 && CurrSelect2<=3){
+				OLED_ShowString(0, 0,  " <-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "开始倒计时         ", OLED_8X16);
+				OLED_ShowString(0, 32, "停止倒计时          ", OLED_8X16);
+				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
+			}
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+//			OLED_ClearArea(0, 16, 32, 16);
+//			
+//			OLED_ShowNum(88, 32, MyRTC_Time.Second, 2, OLED_8X16);
+
+//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+//			OLED_UpdateArea(0, 16, 32, 16);
+			
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect2--;
+			if(CurrSelect2 <= 0){
+				CurrSelect2 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect2++;
+			if(CurrSelect2 > 3){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu2_Select = CurrSelect2;
+		}
+		
+		switch(Menu2_Select){
+			case 1:
+				Menu2_Select = 0;
+				return;
+			case 2:
+				Menu2_Select = 0;
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 倒计时三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_CountDown(void){
+	uint8_t Menu2_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			
+			if(CurrSelect2>=1 && CurrSelect2<=3){
+				OLED_ShowString(0, 0, " <-                ", OLED_8X16);
+				OLED_ShowString(0, 16, "加1秒钟            ", OLED_8X16);
+				OLED_ShowString(0, 32, "减1秒钟            ", OLED_8X16);
+				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
+			}else if(CurrSelect2>=4 && CurrSelect2<=6){
+				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
+				OLED_ShowString(0, 16, "加1分钟            ", OLED_8X16);
+				OLED_ShowString(0, 32, "减1分钟            ", OLED_8X16);
+				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
+			}else if(CurrSelect2>=7 && CurrSelect2<=9){
+				OLED_ShowString(0, 0,  "<-             	  ", OLED_8X16);
+				OLED_ShowString(0, 16, "加1小时            ", OLED_8X16);
+				OLED_ShowString(0, 32, "减1小时            ", OLED_8X16);
+				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
+			}
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+//			OLED_ClearArea(0, 16, 32, 16);
+//			
+//			OLED_ShowNum(88, 32, MyRTC_Time.Second, 2, OLED_8X16);
+
+//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+//			OLED_UpdateArea(0, 16, 32, 16);
+			
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect2--;
+			if(CurrSelect2 <= 0){
+				CurrSelect2 = 9;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect2++;
+			if(CurrSelect2 > 9){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu2_Select = CurrSelect2;
+		}
+		
+		switch(Menu2_Select){
+			case 1:
+				Menu2_Select = 0;
+				return;
+			case 2:
 				Menu2_Select = 0;
 				break;
 		}
@@ -318,9 +461,8 @@ void Menu2_Clock(void){
 		
 		switch(Menu2_Select){
 			case 1:
-				return;
 				Menu2_Select = 0;
-				break;
+				return;
 			case 2:
 				Menu2_Select = 0;
 				break;
@@ -340,6 +482,7 @@ void Menu2_Debug(void){
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
+			
 			OLED_ShowString(0, 0,  "<-               ", OLED_8X16);
 			OLED_ShowString(0, 16, "Temp:XX.X℃      ", OLED_8X16);
 			OLED_ShowString(0, 32, "Distance:XX.Xcm  ", OLED_8X16);
@@ -397,9 +540,8 @@ void Menu2_Debug(void){
 		
 		switch(Menu2_Select){
 			case 1:
-				return;
 				Menu2_Select = 0;
-				break;
+				return;
 		}
 	}
 }
