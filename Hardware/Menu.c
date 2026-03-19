@@ -42,22 +42,21 @@ uint8_t Menu1(void){
 			CurrState = 1;
 		}
 		
-		uint8_t KeyNum = Key_GetNum();
-		if(KeyNum==1){//上一项
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			CurrSelect1--;
 			if(CurrSelect1 <= 0){
 				CurrSelect1=TotalSelect;
 			}
-		}else if(KeyNum==2){//下一项
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			CurrSelect1++;
 			if(CurrSelect1 > TotalSelect){
 				CurrSelect1=1;
 			}
-		}else if(KeyNum==3){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			OLED_Clear();
@@ -74,7 +73,6 @@ uint8_t Menu1(void){
   */
 void Menu2_Temp(){
 	uint8_t Menu2_Select = 0;
-	uint8_t KeyNum;
 
 	while(1){
 		if(CurrState == 0){
@@ -109,22 +107,21 @@ void Menu2_Temp(){
 			OLED_UpdateArea(104, 0, 8, 16);
 		}
 		
-		KeyNum = Key_GetNum();
-		if(KeyNum==1){//上一项
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
 				CurrSelect2 = 3;
 			}
-		}else if(KeyNum==2){//下一项
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2++;
 			if(CurrSelect2 > 3){
 				CurrSelect2 = 1;
 			}
-		}else if(KeyNum==3){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			OLED_Clear();
@@ -139,7 +136,6 @@ void Menu2_Temp(){
 				break;
 			case 2:		//启动温度调节档位
 				AD_Collect_Start();
-				Distance_Detect_Start();
 				Temp2Gear = 1;
 				Last_Gear = 0;
 				Menu2_Select = 0;
@@ -149,8 +145,8 @@ void Menu2_Temp(){
 				Temp = 0;
 				Temp2Gear = 0;
 				Gear = 0;
-				Temp_Match_Gear();
-				Distance_Detect_Stop();
+				Last_Gear = 0;
+				Motor_Stop();
 				Menu2_Select = 0;
 				break;
 //			case 4:		
@@ -162,16 +158,13 @@ void Menu2_Temp(){
 	}
 }
 
-
-
 /**
   * @brief 风扇档位控制二级菜单
   * @param 无
   * @retval 无
   */
 void Menu2_Fan(void){
-	uint8_t Menu2_Select;
-	uint8_t KeyNum;
+	uint8_t Menu2_Select = 0;
 
 	while(1){
 		if(CurrState == 0){
@@ -181,40 +174,45 @@ void Menu2_Fan(void){
 			OLED_ShowString(0, 32, "降档               ", OLED_8X16);
 			OLED_ShowString(0, 48, "停止               ", OLED_8X16);
 			
-			if(Temp2Gear){
-				OLED_ShowString(24, 0, "自动", OLED_8X16);
-			}else{
-				OLED_ShowString(24, 0, "手动", OLED_8X16);
-			}
+			
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
 			OLED_Update();
 			CurrState = 1;
 		}else{
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(24, 0, 32, 16);
 			OLED_ClearArea(104, 0, 8, 16);
+			
 			OLED_ShowNum(104, 0, Gear, 1, OLED_8X16);
 			if(!IsSafe)
 				OLED_DrawRectangle(104, 0, 8, 16, OLED_UNFILLED);
+			
+			if(Temp2Gear){
+				OLED_ShowString(24, 0, "自动", OLED_8X16);
+			}else{
+				OLED_ShowString(24, 0, "手动", OLED_8X16);
+			}
+			
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(24, 0, 32, 16);
 			OLED_UpdateArea(104, 0, 8, 16);
 		}
 		
-		KeyNum = Key_GetNum();
-		if(KeyNum==1){//上一项
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
 				CurrSelect2 = 4;
 			}
-		}else if(KeyNum==2){//下一项
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2++;
 			if(CurrSelect2 > 4){
 				CurrSelect2 = 1;
 			}
-		}else if(KeyNum==3){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			OLED_Clear();
@@ -228,7 +226,6 @@ void Menu2_Fan(void){
 				Menu2_Select = 0;
 				break;
 			case 2:		//升档
-				Distance_Detect_Start();
 				Temp2Gear = 0;
 				if(Gear < 5){
 					Gear++;
@@ -242,14 +239,13 @@ void Menu2_Fan(void){
 					Gear--;
 				}
 				Motor_SetSpeed(Gear * 20);
-				if(Gear == 0) Distance_Detect_Stop();
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
 				Temp2Gear = 0;
 				Gear = 0;
-				Motor_SetSpeed(0);
-				Distance_Detect_Stop();
+				Last_Gear = 0;
+				Motor_Stop();
 				Menu2_Select = 0;
 				break;
 		}
@@ -262,8 +258,8 @@ void Menu2_Fan(void){
   * @retval 无
   */
 void Menu2_Clock(void){
-	uint8_t Menu2_Select;
-	uint8_t KeyNum;
+	uint8_t Menu2_Select = 0;
+	
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
@@ -301,20 +297,19 @@ void Menu2_Clock(void){
 			OLED_UpdateArea(88, 32, 16, 16); 
 		}
 		
-		KeyNum = Key_GetNum();
-		if(KeyNum==1){//上一项
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
 				CurrSelect2 = 2;
 			}
-		}else if(KeyNum==2){//下一项
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			CurrSelect2++;
 			if(CurrSelect2 > 2){
 				CurrSelect2 = 1;
 			}
-		}else if(KeyNum==3){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_Clear();
 			OLED_Update();
@@ -339,8 +334,7 @@ void Menu2_Clock(void){
   * @retval 无
   */
 void Menu2_Debug(void){
-	uint8_t Menu2_Select;
-	uint8_t KeyNum;
+	uint8_t Menu2_Select = 0;
 	float distance;
 	
 	while(1){
@@ -382,20 +376,19 @@ void Menu2_Debug(void){
 
 		}
 		
-		KeyNum = Key_GetNum();
-		if(KeyNum==1){//上一项
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
 				CurrSelect2 = 1;
 			}
-		}else if(KeyNum==2){//下一项
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			CurrSelect2++;
 			if(CurrSelect2 > 1){
 				CurrSelect2 = 1;
 			}
-		}else if(KeyNum==3){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
 			OLED_Clear();
 			OLED_Update();

@@ -105,9 +105,6 @@ void AD_Collect_Start(void)
     
     // 2. 启动ADC连续转换
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);//软件触发ADC开始工作，由于ADC处于连续转换模式，故触发一次后ADC就可以一直连续不断地工作
-    
-	// 启动中断计时器
-	TIM_Cmd(TIM3, ENABLE);
 	
     // 3. 更新采集状态
     AD_Collect_Status = 1;
@@ -128,10 +125,6 @@ void AD_Collect_Stop(void)
     ADC_Cmd(ADC1, DISABLE);
     ADC_DMACmd(ADC1, DISABLE);
     DMA_Cmd(DMA1_Channel1, DISABLE);
-	
-	// 关闭中断计时器
-	if(Gear == 0)
-		TIM_Cmd(TIM3, DISABLE);
     
     // 3. 清空采集值（可选，避免关闭后残留旧值）
     AD_Value = 0;

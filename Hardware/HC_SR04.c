@@ -225,13 +225,4 @@ float HC_SR04_GetDistance(void)
     return CalcWindowAverage();
 }
 
-void Distance_Detect_Start(void){
-	// 启动中断计时器
-	TIM_Cmd(TIM3, ENABLE);
-}
-
-void Distance_Detect_Stop(void){
-	// 关闭中断计时器
-	TIM_Cmd(TIM3, DISABLE);
-}
 

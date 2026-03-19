@@ -40,7 +40,7 @@ void Timer_Init(void){
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
 	NVIC_Init(&NVIC_InitStruct);
 	
-	TIM_Cmd(TIM3, DISABLE);
+	TIM_Cmd(TIM3, ENABLE);
 }
 
 /**
@@ -120,8 +120,9 @@ void TIM3_IRQHandler(void){
 					Motor_SetSpeed(Gear * 20);
 				}
 			}
-			
 		}
+		
+		Key_Tick();
 		
 	}
 }

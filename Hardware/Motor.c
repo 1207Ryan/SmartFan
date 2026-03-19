@@ -25,3 +25,9 @@ void Motor_SetSpeed(int8_t Speed){
 		PWM_SetCompare3(-Speed);
 	}
 }
+
+void Motor_Stop(void){
+	GPIO_SetBits(GPIOA, GPIO_Pin_4);
+	GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+	PWM_SetCompare3(0);
+}
