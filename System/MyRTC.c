@@ -89,3 +89,220 @@ void MyRTC_ReadTime(void)
 	MyRTC_Time.Minute = time_date.tm_min;
 	MyRTC_Time.Second = time_date.tm_sec;
 }
+
+void MyRTC_Add_1Year(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900 + 1;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Year(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900 - 1;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Add_1Month(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1 + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Month(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1 - 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Add_1Day(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday + 1;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Day(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday - 1;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Add_1Hour(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour + 1;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Hour(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour - 1;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Add_1Minute(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min + 1;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Minute(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min - 1;
+	MyRTC_Time.Second = time_date.tm_sec;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Add_1Second(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec + 1;
+	
+	MyRTC_SetTime();
+}
+
+void MyRTC_Sub_1Second(void){
+	time_t time_cnt;
+	struct tm time_date;
+	
+	time_cnt = RTC_GetCounter();
+	time_cnt += 8*60*60;
+	time_date = *localtime(&time_cnt);
+	
+	MyRTC_Time.Year = time_date.tm_year + 1900;
+	MyRTC_Time.Month= time_date.tm_mon + 1;
+	MyRTC_Time.Day = time_date.tm_mday;
+	MyRTC_Time.Hour = time_date.tm_hour;
+	MyRTC_Time.Minute = time_date.tm_min;
+	MyRTC_Time.Second = time_date.tm_sec - 1;
+	
+	MyRTC_SetTime();
+}
+

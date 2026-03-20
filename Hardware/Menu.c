@@ -11,10 +11,10 @@
 #include "Count_Down.h"
 #include "Timer.h"
 
-
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
 uint8_t CurrSelect3 = 1;
+uint8_t CurrSelect4 = 1;
 uint8_t CurrState = 0;
 
 volatile uint8_t Working = 0;
@@ -413,12 +413,7 @@ void Menu3_CountDown(void){
 			if(CurrSelect3 > 9){
 				CurrSelect3 = 1;
 			}
-		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
-			CurrState = 0;
-			OLED_Clear();
-			OLED_Update();
-			Menu3_Select = CurrSelect3;
-		}else if(Key_Check(KEY_3, KEY_REPEAT)){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
 			CurrState = 0;
 			OLED_Clear();
 			OLED_Update();
@@ -427,8 +422,8 @@ void Menu3_CountDown(void){
 		
 		switch(Menu3_Select){
 			case 1:
-				CurrSelect3 = 0;
 				Menu3_Select = 0;
+				CurrSelect3 = 1;
 				return;
 			case 2:
 				Menu3_Select = 0;
@@ -439,8 +434,8 @@ void Menu3_CountDown(void){
 				Count_Sub_1s();
 				break;
 			case 4:
-				CurrSelect3 = 0;
 				Menu3_Select = 0;
+				CurrSelect3 = 1;
 				return;
 			case 5:
 				Menu3_Select = 0;
@@ -451,8 +446,8 @@ void Menu3_CountDown(void){
 				Count_Sub_1m();
 				break;
 			case 7:
-				CurrSelect3 = 0;
 				Menu3_Select = 0;
+				CurrSelect3 = 1;
 				return;
 			case 8:
 				Menu3_Select = 0;
@@ -480,7 +475,7 @@ void Menu2_Clock(void){
 			OLED_ShowString(0, 0, "<-               ", OLED_8X16);
 			OLED_ShowString(0, 16, "Date:XXXX-XX-XX", OLED_8X16);
 			OLED_ShowString(0, 32, "Time:XX:XX:XX  ", OLED_8X16);
-			OLED_ShowString(0, 48, "            设置", OLED_8X16);
+			OLED_ShowString(0, 48, "设置日期和时间  ", OLED_8X16);
 			
 			OLED_ReverseArea(0, (CurrSelect2 - 1)*48, 128, 16);
 			OLED_Update();
@@ -536,6 +531,275 @@ void Menu2_Clock(void){
 				return;
 			case 2:
 				Menu2_Select = 0;
+				Menu3_SetDateAndTime();
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 时钟控制三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_SetDateAndTime(void){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			OLED_ShowString(0, 0,  "<-            ", OLED_8X16);
+			OLED_ShowString(0, 16, "设置日期        ", OLED_8X16);
+			OLED_ShowString(0, 32, "设置时间        ", OLED_8X16);
+			OLED_ShowString(0, 48, "              ", OLED_8X16);
+			
+			OLED_ReverseArea(0, (CurrSelect3 - 1)*16, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 3){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				return;
+			case 2:
+				Menu3_Select = 0;
+				Menu4_SetDate();
+				break;
+			case 3:
+				Menu3_Select = 0;
+				Menu4_SetTime();
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 时钟控制四级菜单，设置日期
+  * @param 无
+  * @retval 无
+  */
+void Menu4_SetDate(void){
+	uint8_t Menu4_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect4 >= 1 && CurrSelect4 <= 3){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "年份+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "年份-1        ", OLED_8X16);
+			}else if(CurrSelect4 >= 4 && CurrSelect4 <= 6){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "月份+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "月份-1        ", OLED_8X16);
+			}else if(CurrSelect4 >= 7 && CurrSelect4 <= 9){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "日期+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "日期-1        ", OLED_8X16);
+			}
+			OLED_ShowString(0, 48, "Date:XXXX-XX-XX", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%48, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%48, 128, 16);
+			OLED_ClearArea(40, 48, 32, 16);
+			OLED_ClearArea(80, 48, 16, 16);
+			OLED_ClearArea(104, 48, 16, 16);
+			MyRTC_ReadTime();
+			
+			OLED_ShowNum(40, 48, MyRTC_Time.Year, 4, OLED_8X16);
+			OLED_ShowNum(80, 48, MyRTC_Time.Month, 2, OLED_8X16);
+			OLED_ShowNum(104, 48, MyRTC_Time.Day, 2, OLED_8X16);
+
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*48)%48, 128, 16);
+			OLED_UpdateArea(40, 48, 32, 16);
+			OLED_UpdateArea(80, 48, 16, 16);
+			OLED_UpdateArea(104, 48, 16, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect4--;
+			if(CurrSelect4 <= 0){
+				CurrSelect4 = 9;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect4++;
+			if(CurrSelect4 > 9){
+				CurrSelect4 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu4_Select = CurrSelect4;
+		}
+		
+		switch(Menu4_Select){
+			case 1:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 2:
+				Menu4_Select = 0;
+				MyRTC_Add_1Year();
+				break;
+			case 3:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Year();
+				break;
+			case 4:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 5:
+				Menu4_Select = 0;
+				MyRTC_Add_1Month();
+				break;
+			case 6:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Month();
+				break;
+			case 7:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 8:
+				Menu4_Select = 0;
+				MyRTC_Add_1Day();
+				break;
+			case 9:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Day();
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 时钟控制四级菜单，设置时间
+  * @param 无
+  * @retval 无
+  */
+void Menu4_SetTime(void){
+	uint8_t Menu4_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect4>=1 && CurrSelect4<=3){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "时钟+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "时钟-1        ", OLED_8X16);
+			}else if(CurrSelect4>=4 && CurrSelect4<=6){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "分钟+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "分钟-1        ", OLED_8X16);
+			}else if(CurrSelect4>=7 && CurrSelect4<=9){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "秒钟+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "秒钟-1        ", OLED_8X16);
+			}
+			OLED_ShowString(0, 48, "Time:XX:XX:XX  ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%48, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%48, 128, 16);
+			OLED_ClearArea(40, 48, 16, 16);
+			OLED_ClearArea(64, 48, 16, 16);
+			OLED_ClearArea(88, 48, 16, 16); 
+			MyRTC_ReadTime();
+			
+			OLED_ShowNum(40, 48, MyRTC_Time.Hour, 2, OLED_8X16);
+			OLED_ShowNum(64, 48, MyRTC_Time.Minute, 2, OLED_8X16);
+			OLED_ShowNum(88, 48, MyRTC_Time.Second, 2, OLED_8X16);
+
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*48)%48, 128, 16);
+			OLED_UpdateArea(40, 48, 16, 16);
+			OLED_UpdateArea(64, 48, 16, 16);
+			OLED_UpdateArea(88, 48, 16, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect4--;
+			if(CurrSelect4 <= 0){
+				CurrSelect4 = 9;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect4++;
+			if(CurrSelect4 > 9){
+				CurrSelect4 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu4_Select = CurrSelect4;
+		}
+		
+		switch(Menu4_Select){
+			case 1:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 2:
+				Menu4_Select = 0;
+				MyRTC_Add_1Hour();
+				break;
+			case 3:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Hour();
+				break;
+			case 4:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 5:
+				Menu4_Select = 0;
+				MyRTC_Add_1Minute();
+				break;
+			case 6:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Minute();
+				break;
+			case 7:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				return;
+			case 8:
+				Menu4_Select = 0;
+				MyRTC_Add_1Second();
+				break;
+			case 9:
+				Menu4_Select = 0;
+				MyRTC_Sub_1Second();
 				break;
 		}
 	}

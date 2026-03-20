@@ -15,4 +15,17 @@ void MyRTC_Init(void);
 void MyRTC_SetTime(void);
 void MyRTC_ReadTime(void);
 
+void MyRTC_Add_1Year(void);
+void MyRTC_Sub_1Year(void);
+void MyRTC_Add_1Month(void);
+void MyRTC_Sub_1Month(void);
+void MyRTC_Add_1Day(void);
+void MyRTC_Sub_1Day(void);
+void MyRTC_Add_1Hour(void);
+void MyRTC_Sub_1Hour(void);
+void MyRTC_Add_1Minute(void);
+void MyRTC_Sub_1Minute(void);
+void MyRTC_Add_1Second(void);
+void MyRTC_Sub_1Second(void);
+
 #endif
