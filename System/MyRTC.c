@@ -306,3 +306,9 @@ void MyRTC_Sub_1Second(void){
 	MyRTC_SetTime();
 }
 
+uint32_t MyRTC_GetCurrentSec(void)
+{
+    // RTC_GetCounter()返回的是减8小时后的秒数，加8小时还原东八区
+    return RTC_GetCounter() + 8 * 60 * 60;
+}
+

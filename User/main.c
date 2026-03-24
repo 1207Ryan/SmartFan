@@ -9,6 +9,7 @@
 #include "MyRTC.h"
 #include "HC_SR04.h"
 #include "Count_Down.h"
+#include "Voice_Recognition.h"
 
 int main(void)
 {
@@ -21,31 +22,11 @@ int main(void)
 	MyRTC_Init();
 	HC_SR04_Init();
 	Count_Down_Init();
-	
-	uint8_t Menu1_Select;
+	Voice_Recognition_Init();
 	
 	while (1)
 	{
-		Menu1_Select = Menu1();
-		switch(Menu1_Select){
-			case 1:
-				Menu2_Temp();
-				break;
-			case 2:
-				Menu2_Fan();
-				break;
-			case 3:
-				Menu2_CountDown();
-				break;
-			case 4:
-				Menu2_Clock();
-				break;
-			case 5:
-				Menu2_Debug();
-				break;
-			
-		}
-		
+		Menu1();
 	}
 }
 

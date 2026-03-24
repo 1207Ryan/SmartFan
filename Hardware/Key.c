@@ -2,6 +2,15 @@
 #include "Key.h"
 #include "Delay.h"
 
+/*
+PB12 - 上一项
+PB13 - 下一项
+PB15 - 确认
+*/
+#define GPIO_Pin_Prev GPIO_Pin_12
+#define GPIO_Pin_Next GPIO_Pin_13
+#define GPIO_Pin_Confirm GPIO_Pin_15
+
 uint8_t Key_Flag[KEY_COUNT];
 //6=REPEAT长按后重复		5=LONG长按	4=DOUBLE双击		3=SINGLE单击
 //2=UP松开瞬间	1=DOWN按下瞬间	0=HOLD按住不放
@@ -11,25 +20,22 @@ void Key_Init(void){
 	
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_Prev | GPIO_Pin_Next | GPIO_Pin_Confirm;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
 uint8_t Key_GetState(uint8_t n){
 	if(n == KEY_1){
-		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) == 0){
+		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_Prev) == 0){
 			return KEY_PRESSED;
 		}
 	}else if(n == KEY_2){
-		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0){
+		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_Next) == 0){
 			return KEY_PRESSED;
 		}
 	}else if(n == KEY_3){
-		if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0){
+		if(GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_Confirm) == 0){
 			return KEY_PRESSED;
 		}
 	}

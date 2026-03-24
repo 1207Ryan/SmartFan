@@ -27,6 +27,8 @@ extern uint32_t cnt;
 extern uint8_t Count_Started;
 
 uint8_t Menu1(void){
+	uint8_t Menu1_Select = 0;
+	
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
@@ -67,7 +69,30 @@ uint8_t Menu1(void){
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			OLED_Clear();
 			OLED_Update();
-			return CurrSelect1;
+			Menu1_Select = CurrSelect1;
+		}
+		
+		switch(Menu1_Select){
+			case 1:
+				Menu1_Select = 0;
+				Menu2_Temp();
+				break;
+			case 2:
+				Menu1_Select = 0;
+				Menu2_Fan();
+				break;
+			case 3:
+				Menu1_Select = 0;
+				Menu2_CountDown();
+				break;
+			case 4:
+				Menu1_Select = 0;
+				Menu2_Clock();
+				break;
+			case 5:
+				Menu1_Select = 0;
+				Menu2_Debug();
+				break;
 		}
 	}
 }
@@ -83,7 +108,7 @@ void Menu2_Temp(){
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
-			OLED_ShowString(0, 0, "<-         ℃ 档", OLED_8X16);
+			OLED_ShowString(0, 0,  "<-         ℃ 档", OLED_8X16);
 			OLED_ShowString(0, 16, "启动温度调节档位  ", OLED_8X16);
 			OLED_ShowString(0, 32, "停止风扇        ", OLED_8X16);
 			OLED_ShowString(0, 48, "              ", OLED_8X16);
@@ -254,12 +279,12 @@ void Menu2_Fan(void){
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
-				Temp2Gear = 0;
 				AD_Collect_Stop();
+				Temp2Gear = 0;
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Working = 1;
+				Working = 0;
 				Menu2_Select = 0;
 				break;
 		}
@@ -279,7 +304,7 @@ void Menu2_CountDown(void){
 			OLED_Clear();
 			
 			if(CurrSelect2>=1 && CurrSelect2<=3){
-				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 0,  "<-            档", OLED_8X16);
 				OLED_ShowString(0, 16, "设置倒计时         ", OLED_8X16);
 				OLED_ShowString(0, 32, "    倒计时          ", OLED_8X16);
 				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
@@ -291,27 +316,29 @@ void Menu2_CountDown(void){
 			OLED_Update();
 			CurrState = 1;
 		}else{
-				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
-				OLED_ClearArea(0, 32, 32, 16);
-				OLED_ClearArea(56, 48, 16, 16);
-				OLED_ClearArea(80, 48, 16, 16);
-				OLED_ClearArea(104, 48, 16, 16);
-				
-				OLED_ShowNum(56, 48, Get_Count()/3600, 2, OLED_8X16);
-				OLED_ShowNum(80, 48, Get_Count()%3600/60, 2, OLED_8X16);
-				OLED_ShowNum(104, 48, Get_Count()%3600%60, 2, OLED_8X16);
-				if(!Count_Started)
-					OLED_ShowString(0, 32, "开始", OLED_8X16);
-				else
-					OLED_ShowString(0, 32, "停止", OLED_8X16);
-				
-				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
-				OLED_UpdateArea(0, 32, 32, 16);
-				OLED_UpdateArea(56, 48, 16, 16);
-				OLED_UpdateArea(80, 48, 16, 16);
-				OLED_UpdateArea(104, 48, 16, 16);
-				
-			}
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_ClearArea(0, 32, 32, 16);
+			OLED_ClearArea(56, 48, 16, 16);
+			OLED_ClearArea(80, 48, 16, 16);
+			OLED_ClearArea(104, 48, 16, 16);
+			OLED_ClearArea(104, 0, 8, 16);
+			
+			OLED_ShowNum(56, 48, Get_Count()/3600, 2, OLED_8X16);
+			OLED_ShowNum(80, 48, Get_Count()%3600/60, 2, OLED_8X16);
+			OLED_ShowNum(104, 48, Get_Count()%3600%60, 2, OLED_8X16);
+			if(!Count_Started)
+				OLED_ShowString(0, 32, "开始", OLED_8X16);
+			else
+				OLED_ShowString(0, 32, "停止", OLED_8X16);
+			OLED_ShowNum(104, 0, Gear, 1, OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%48, 128, 16);
+			OLED_UpdateArea(0, 32, 32, 16);
+			OLED_UpdateArea(56, 48, 16, 16);
+			OLED_UpdateArea(80, 48, 16, 16);
+			OLED_UpdateArea(104, 48, 16, 16);
+			OLED_UpdateArea(104, 0, 8, 16);
+		}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
@@ -364,16 +391,16 @@ void Menu3_CountDown(void){
 		if(CurrState == 0){
 			OLED_Clear();
 			
-			if(CurrSelect3>=1 && CurrSelect3<=3){
+			if(CurrSelect3 >= 1 && CurrSelect3 <= 3){
 				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1秒钟            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1秒钟            ", OLED_8X16);
-			}else if(CurrSelect3>=4 && CurrSelect3<=6){
+			}else if(CurrSelect3 >= 4 && CurrSelect3 <= 6){
 				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1分钟            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1分钟            ", OLED_8X16);
-			}else if(CurrSelect3>=7 && CurrSelect3<=9){
-				OLED_ShowString(0, 0,  "<-             	  ", OLED_8X16);
+			}else if(CurrSelect3 >= 7 && CurrSelect3 <= 9){
+				OLED_ShowString(0, 0,  "<-                ", OLED_8X16);
 				OLED_ShowString(0, 16, "加1小时            ", OLED_8X16);
 				OLED_ShowString(0, 32, "减1小时            ", OLED_8X16);
 			}

@@ -34,3 +34,5 @@
 .\objects\timer.o: .\Hardware\AD.h
 .\objects\timer.o: .\Hardware\HC_SR04.h
 .\objects\timer.o: .\Hardware\Motor.h
+.\objects\timer.o: .\Hardware\Voice_Recognition.h
+.\objects\timer.o: System\MyRTC.h

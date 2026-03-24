@@ -29,3 +29,4 @@
 .\objects\count_down.o: .\Library\stm32f10x_wwdg.h
 .\objects\count_down.o: .\Library\misc.h
 .\objects\count_down.o: .\Hardware\Motor.h
+.\objects\count_down.o: .\Hardware\Voice_Recognition.h

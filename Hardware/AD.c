@@ -2,7 +2,13 @@
 #include "math.h"
 #include "Timer.h"
 
-// ===== 硬件参数配置（根据你的电路修改）=====
+/*
+AO - PA3
+*/
+#define ADC_Pin GPIO_Pin_7
+#define ADC_Channel ADC_Channel_7
+
+// ===== 硬件参数配置=====
 #define NTC_R_REF    10000.0f  // 分压电阻值
 #define NTC_B_VALUE  3950.0f   // NTC的B值
 #define NTC_R_25     10000.0f  // 25℃时NTC阻值
@@ -36,12 +42,12 @@ void AD_Init(void)
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+	GPIO_InitStructure.GPIO_Pin = ADC_Pin;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);					//将PA1引脚初始化为模拟输入
 
 	/*规则组通道配置*/
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 1, ADC_SampleTime_55Cycles5);	//规则组序列1的位置，配置为通道0
+	ADC_RegularChannelConfig(ADC1, ADC_Channel, 1, ADC_SampleTime_55Cycles5);	//规则组序列1的位置，配置为通道0
 
 	/*ADC初始化*/
 	ADC_InitTypeDef ADC_InitStructure;											//定义结构体变量

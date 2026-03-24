@@ -1,5 +1,6 @@
 #include "stm32f10x.h"                  // Device header
 #include "Motor.h"
+#include "Voice_Recognition.h"
 
 uint32_t cnt = 0;
 uint8_t Count_Started = 0;
@@ -17,7 +18,7 @@ void Count_Down_Init(void){		//1s 计数
 	
 	//CK_PSC/（PSC+1）/（ARR+1）
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
-	TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;	//4分频，定时器时钟 = 18MHz
+	TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;	//1分频
 	TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;	//向上计数
 	TIM_TimeBaseInitStruct.TIM_Period = 10000 - 1;				//ARR 
 	TIM_TimeBaseInitStruct.TIM_Prescaler = 7200 - 1;			//PSC 
@@ -40,6 +41,9 @@ void Count_Down_Init(void){		//1s 计数
 	TIM_Cmd(TIM1, DISABLE);
 }
 
+void Count_Set_0(void){
+	cnt = 0;
+}
 void Count_Add_1s(void){
 	cnt += 1;
 }
@@ -49,6 +53,10 @@ void Count_Sub_1s(void){
 		cnt -= 1;
 	else
 		cnt = 0;
+}
+
+void Count_Add_Second(uint8_t Second){
+	cnt += Second;
 }
 
 void Count_Add_1m(void){
@@ -62,6 +70,11 @@ void Count_Sub_1m(void){
 		cnt = 0;
 }
 
+void Count_Add_Minute(uint8_t Minute){
+	cnt += Minute * 60;
+}
+
+
 void Count_Add_1h(void){
 	cnt += 3600;
 }
@@ -72,6 +85,11 @@ void Count_Sub_1h(void){
 	else
 		cnt = 0;
 }
+
+void Count_Add_Hour(uint8_t Hour){
+	cnt += Hour * 3600;
+}
+
 
 void Count_Start(void){
 	TIM_Cmd(TIM1, ENABLE);
@@ -102,6 +120,7 @@ void TIM1_UP_IRQHandler(void){
 			Working = 0;
 			Temp2Gear = 0;
 			Count_Started = 0;
+			Count_Down_Over();
 		}
 		
 	}

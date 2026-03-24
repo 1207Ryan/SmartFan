@@ -27,5 +27,6 @@ void MyRTC_Add_1Minute(void);
 void MyRTC_Sub_1Minute(void);
 void MyRTC_Add_1Second(void);
 void MyRTC_Sub_1Second(void);
+uint32_t MyRTC_GetCurrentSec(void);
 
 #endif

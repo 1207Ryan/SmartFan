@@ -2,6 +2,11 @@
 #include "HC_SR04.h"
 #include "Delay.h"
 
+/*
+Trig - PA5
+Echo - PA4
+*/
+
 // 全局变量（仅本文件可见）
 static uint32_t g_Echo_Time = 0;  // Echo脉冲宽度（us，扩大为32位防溢出）
 static uint16_t g_Tim4MsCount = 0;// TIM4 1ms中断计数（兼容辰哥逻辑，防溢出）
@@ -19,7 +24,7 @@ static uint8_t g_WindowIndex = 0;
 #define MAX_ECHO_TIME 5800
 
 /**
- * @brief TIM4中断服务函数（新增：1ms累加，防溢出）
+ * @brief TIM4中断服务函数（1ms累加）
  */
 void TIM4_IRQHandler(void)
 {
@@ -40,7 +45,7 @@ static void TIM4_TimeInit(void)
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStruct.TIM_Period = 1000 - 1; // 1ms中断）
+    TIM_TimeBaseInitStruct.TIM_Period = 1000 - 1; // 1ms中断
     TIM_TimeBaseInitStruct.TIM_Prescaler = 72 - 1; // 
     TIM_TimeBaseInitStruct.TIM_RepetitionCounter = 0;
     TIM_TimeBaseInit(TIM4, &TIM_TimeBaseInitStruct);
@@ -68,10 +73,10 @@ static void ECHO_EXTI_Init(void)
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(ECHO_PORT, &GPIO_InitStruct);
 
-    GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource12);
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource4);
 
     EXTI_InitTypeDef EXTI_InitStruct;
-    EXTI_InitStruct.EXTI_Line = EXTI_Line12;
+    EXTI_InitStruct.EXTI_Line = EXTI_Line4;
     EXTI_InitStruct.EXTI_LineCmd = ENABLE;
     EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
     EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
@@ -81,7 +86,7 @@ static void ECHO_EXTI_Init(void)
 	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);		//已有
 	
     NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = EXTI15_10_IRQn;
+    NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
@@ -124,11 +129,11 @@ void HC_SR04_Init(void)
 }
 
 /**
- * @brief EXTI15_10中断服务函数（修复：累加计时防溢出）
+ * @brief EXTI4中断服务函数（修复：累加计时防溢出）
  */
-void EXTI15_10_IRQHandler(void)
+void EXTI4_IRQHandler(void)
 {
-    if (EXTI_GetITStatus(EXTI_Line12) != RESET)
+    if (EXTI_GetITStatus(EXTI_Line4) != RESET)
     {
         if (GPIO_ReadInputDataBit(ECHO_PORT, ECHO_PIN) == 1)
         {
@@ -145,7 +150,7 @@ void EXTI15_10_IRQHandler(void)
             g_Echo_Time = (uint32_t)g_Tim4MsCount * 1000 + TIM_GetCounter(TIM4);
             g_Echo_Flag = 1;
         }
-        EXTI_ClearITPendingBit(EXTI_Line12);
+        EXTI_ClearITPendingBit(EXTI_Line4);
     }
 }
 

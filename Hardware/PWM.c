@@ -1,5 +1,9 @@
 #include "stm32f10x.h"                  // Device header
 
+/*
+PWMA - PA0
+*/
+
 void PWM_Init(void){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -10,7 +14,7 @@ void PWM_Init(void){
 	
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	
@@ -30,12 +34,12 @@ void PWM_Init(void){
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_Pulse = 0;		//CCR
-	TIM_OC3Init(TIM2, &TIM_OCInitStructure);
+	TIM_OC1Init(TIM2, &TIM_OCInitStructure);//通道数
 	
 	TIM_Cmd(TIM2, ENABLE);
 }
 
-void PWM_SetCompare3(uint16_t Compare){
-	TIM_SetCompare3(TIM2, Compare);
+void PWM_SetCompare1(uint16_t Compare){
+	TIM_SetCompare1(TIM2, Compare);
 	
 }

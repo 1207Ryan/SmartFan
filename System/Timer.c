@@ -5,6 +5,12 @@
 #include "AD.h"
 #include "HC_SR04.h"
 #include "Motor.h"
+#include "Voice_Recognition.h"
+#include "MyRTC.h"
+
+#define WARN_INTERVAL 5    // 警告间隔：5秒
+uint32_t last_warn_sec = 0;  // 上次发送警告的系统时间（s）
+uint32_t now_sec;
 
 extern volatile uint8_t Working;
 extern volatile uint8_t Gear;
@@ -67,7 +73,6 @@ void Temp_Match_Gear(void){
 		
 		if(Gear != Last_Gear){
 			Motor_SetGear(Gear);
-
 			Last_Gear = Gear; // 更新旧档位
 		}
 	}else{
@@ -98,6 +103,14 @@ void TIM3_IRQHandler(void){
 			current_dist = HC_SR04_GetDistance();
 			if(current_dist < SATE_DISTANCE){
 				IsSafe = 0;
+				
+				now_sec = MyRTC_GetCurrentSec(); // 获取当前秒数
+				// 条件1：首次触发警告  条件2：距离过近且已过5秒
+				if((last_warn_sec == 0) || (now_sec  - last_warn_sec >= WARN_INTERVAL)){
+					Distance_Warn();              // 发送警告
+					last_warn_sec = now_sec ; // 更新上次发送时间
+				}
+				
 				if(Gear > 0){
 					Last_Gear = Gear;
 					Gear = 0;
@@ -114,6 +127,12 @@ void TIM3_IRQHandler(void){
 		}
 		
 		Key_Tick();
+		
+		if(refresh_tick %10 == 0){
+			// 10ms
+			Voice_Recognition();
+		}
+		
 		
 	}
 }
