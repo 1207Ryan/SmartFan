@@ -15,5 +15,6 @@ void Count_Add_Hour(uint8_t Hour);
 void Count_Start(void);
 void Count_Stop(void);
 uint32_t Get_Count(void);
+void Count_Down_Over(void);
 
 #endif

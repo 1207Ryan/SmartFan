@@ -1,6 +1,8 @@
 #include "stm32f10x.h"                  // Device header
 #include "Motor.h"
 #include "Voice_Recognition.h"
+#include "Serial.h"
+#include "HC_04.h"
 
 uint32_t cnt = 0;
 uint8_t Count_Started = 0;
@@ -119,6 +121,7 @@ void TIM1_UP_IRQHandler(void){
 			Last_Gear = 0;
 			Working = 0;
 			Temp2Gear = 0;
+			Temp = 0;
 			Count_Started = 0;
 			Count_Down_Over();
 		}
@@ -126,4 +129,9 @@ void TIM1_UP_IRQHandler(void){
 	}
 }
 
-
+void Count_Down_Over(void)
+{
+	Serial_SendByte(0x2E);
+	Serial2_SendString("倒计时已结束");
+	Serial2_SendByte('\n');
+}

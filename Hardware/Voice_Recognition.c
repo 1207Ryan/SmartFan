@@ -1,16 +1,14 @@
 #include "stm32f10x.h"                  // Device header
 #include "Serial.h"
 #include "Delay.h"
-#include "OLED.h"
-#include "Key.h"
 #include "Menu.h"
-#include "LED.h"
 #include "Motor.h"
 #include "MyRTC.h"
 #include "AD.h"
 #include "HC_SR04.h"
 #include "Count_Down.h"
 #include "Timer.h"
+#include <string.h> 
 
 /*
 STM32 PA9 - ASRPRO PB6/PA3
@@ -32,6 +30,8 @@ extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
 extern uint8_t Count_Started;
 uint8_t Count_State = 9;
+uint8_t High_Byte;
+uint8_t Low_Byte;
 
 void Voice_Recognition_Init(void){
 	Serial_Init();
@@ -68,7 +68,6 @@ void Voice_Recognition(void){
 				Serial_SendByte(temp_int);  // 第一次发送：整数位（25 → 0x19）
                 Delay_ms(1);                // 短暂延时，避免接收端粘包（可选）
                 Serial_SendByte(temp_dec);  // 第二次发送：小数位（6 → 0x06）
-                Serial_SendByte('\n');          // 结束符（方便接收端解析）
 				break;
 			case 0x11:
 				Temp2Gear = 0;
@@ -93,7 +92,6 @@ void Voice_Recognition(void){
 			case 0x13:
 				Serial_SendByte(RxData);
                 Serial_SendByte(Gear);  
-                Serial_SendByte('\n');          // 结束符
 				break;
 			case 0x2C:
 				Count_Set_0();
@@ -299,12 +297,20 @@ void Voice_Recognition(void){
 				break;
 			case 0x31:
 				MyRTC_ReadTime();
-				Serial_SendByte(MyRTC_Time.Year);
-				Serial_SendByte(MyRTC_Time.Month);
-				Serial_SendByte(MyRTC_Time.Day);
-				Serial_SendByte(MyRTC_Time.Hour);
-				Serial_SendByte(MyRTC_Time.Minute);
-				Serial_SendByte(MyRTC_Time.Second);
+				
+				memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				
+				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
+				Serial_TxPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
+				Serial_TxPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
+				Serial_TxPacket[2] = MyRTC_Time.Month;
+				Serial_TxPacket[3] = MyRTC_Time.Day;
+				Serial_TxPacket[4] = MyRTC_Time.Weekday;
+				Serial_TxPacket[5] = MyRTC_Time.Hour;
+				Serial_TxPacket[6] = MyRTC_Time.Minute;
+				Serial_TxPacket[7] = MyRTC_Time.Second;
+				
+				Serial_SendPacket();
 				break;
 		}
 	}
@@ -312,8 +318,4 @@ void Voice_Recognition(void){
 
 void Distance_Warn(void){
 	Serial_SendByte(0x14);
-}
-
-void Count_Down_Over(void){
-	Serial_SendByte(0x2E);
 }

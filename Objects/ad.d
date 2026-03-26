@@ -30,3 +30,4 @@
 .\objects\ad.o: .\Library\misc.h
 .\objects\ad.o: D:\Keil5\ARM\ARMCC\Bin\..\include\math.h
 .\objects\ad.o: .\System\Timer.h
+.\objects\ad.o: Hardware\AD.h

@@ -40,3 +40,4 @@
 .\objects\main.o: .\Hardware\HC_SR04.h
 .\objects\main.o: .\System\Count_Down.h
 .\objects\main.o: .\Hardware\Voice_Recognition.h
+.\objects\main.o: .\Hardware\Bluetooth.h

@@ -1,5 +1,4 @@
 --cpu Cortex-M3
-".\objects\led.o"
 ".\objects\oled.o"
 ".\objects\pwm.o"
 ".\objects\motor.o"
@@ -10,6 +9,8 @@
 ".\objects\hc_sr04.o"
 ".\objects\serial.o"
 ".\objects\voice_recognition.o"
+".\objects\hc_04.o"
+".\objects\bluetooth.o"
 ".\objects\count_down.o"
 ".\objects\delay.o"
 ".\objects\myrtc.o"

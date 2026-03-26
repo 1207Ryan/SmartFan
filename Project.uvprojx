@@ -381,16 +381,6 @@
           <GroupName>Hardware</GroupName>
           <Files>
             <File>
-              <FileName>LED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\LED.c</FilePath>
-            </File>
-            <File>
-              <FileName>LED.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\LED.h</FilePath>
-            </File>
-            <File>
               <FileName>OLED.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\OLED.c</FilePath>
@@ -489,6 +479,26 @@
               <FileName>Voice_Recognition.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\Voice_Recognition.h</FilePath>
+            </File>
+            <File>
+              <FileName>HC_04.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\HC_04.c</FilePath>
+            </File>
+            <File>
+              <FileName>HC_04.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\HC_04.h</FilePath>
+            </File>
+            <File>
+              <FileName>Bluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\Bluetooth.c</FilePath>
+            </File>
+            <File>
+              <FileName>Bluetooth.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\Bluetooth.h</FilePath>
             </File>
           </Files>
         </Group>

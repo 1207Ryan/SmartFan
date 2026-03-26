@@ -1,20 +1,11 @@
 #include "stm32f10x.h"                  // Device header
 #include "math.h"
 #include "Timer.h"
+#include "AD.h"
 
 /*
 AO - PA3
 */
-#define ADC_Pin GPIO_Pin_7
-#define ADC_Channel ADC_Channel_7
-
-// ===== 硬件参数配置=====
-#define NTC_R_REF    10000.0f  // 分压电阻值
-#define NTC_B_VALUE  3950.0f   // NTC的B值
-#define NTC_R_25     10000.0f  // 25℃时NTC阻值
-#define ADC_MAX      4095.0f   // 12位ADC最大值
-#define VCC          3.3f      // 供电电压
-#define WINDOW_SIZE  8         // 滑动窗口长度（建议8-12，越小响应越快）
 
 uint16_t AD_Value;			  	//定义用于存放AD转换结果的全局数组
 float Temp_Value = 0.0f;      	// 转换后的温度值（单位：℃）
@@ -22,7 +13,6 @@ uint8_t AD_Collect_Status = 0;	// 采集状态：0=关闭，1=开启
 static float temp_window[WINDOW_SIZE]; // 滑动窗口缓存
 static uint8_t window_count = 0;       // 窗口内有效数据个数
 static uint8_t window_index = 0;       // 当前写入索引
-
 
 /**
   * 函    数：AD初始化

@@ -10,6 +10,7 @@
 #include "HC_SR04.h"
 #include "Count_Down.h"
 #include "Voice_Recognition.h"
+#include "Bluetooth.h"
 
 int main(void)
 {
@@ -23,6 +24,7 @@ int main(void)
 	HC_SR04_Init();
 	Count_Down_Init();
 	Voice_Recognition_Init();
+	Bluetooth_Init();
 	
 	while (1)
 	{

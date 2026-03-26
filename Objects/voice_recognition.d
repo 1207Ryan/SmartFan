@@ -31,14 +31,11 @@
 .\objects\voice_recognition.o: Hardware\Serial.h
 .\objects\voice_recognition.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\voice_recognition.o: .\System\Delay.h
-.\objects\voice_recognition.o: Hardware\OLED.h
-.\objects\voice_recognition.o: Hardware\OLED_Data.h
-.\objects\voice_recognition.o: Hardware\Key.h
 .\objects\voice_recognition.o: Hardware\Menu.h
-.\objects\voice_recognition.o: Hardware\LED.h
 .\objects\voice_recognition.o: Hardware\Motor.h
 .\objects\voice_recognition.o: .\System\MyRTC.h
 .\objects\voice_recognition.o: Hardware\AD.h
 .\objects\voice_recognition.o: Hardware\HC_SR04.h
 .\objects\voice_recognition.o: .\System\Count_Down.h
 .\objects\voice_recognition.o: .\System\Timer.h
+.\objects\voice_recognition.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h

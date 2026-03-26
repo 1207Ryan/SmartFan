@@ -3,13 +3,13 @@
 #include "OLED.h"
 #include "Key.h"
 #include "Menu.h"
-#include "LED.h"
 #include "Motor.h"
 #include "MyRTC.h"
 #include "AD.h"
 #include "HC_SR04.h"
 #include "Count_Down.h"
 #include "Timer.h"
+#include "Serial.h"
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -169,6 +169,7 @@ void Menu2_Temp(){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
+				Serial_SendByte(0x01);
 				Menu2_Select = 0;
 				break;
 			case 3:		//停止风扇
@@ -179,6 +180,7 @@ void Menu2_Temp(){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
+				Serial_SendByte(0x02);
 				Menu2_Select = 0;
 				break;
 //			case 4:		
@@ -265,6 +267,7 @@ void Menu2_Fan(void){
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
+				Serial_SendByte(0x11);
 				Menu2_Select = 0;
 				break;
 			case 3:		//降档
@@ -276,6 +279,7 @@ void Menu2_Fan(void){
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
 				if(Gear == 0) Working = 0;
+				Serial_SendByte(0x12);
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
@@ -323,9 +327,10 @@ void Menu2_CountDown(void){
 			OLED_ClearArea(104, 48, 16, 16);
 			OLED_ClearArea(104, 0, 8, 16);
 			
-			OLED_ShowNum(56, 48, Get_Count()/3600, 2, OLED_8X16);
-			OLED_ShowNum(80, 48, Get_Count()%3600/60, 2, OLED_8X16);
-			OLED_ShowNum(104, 48, Get_Count()%3600%60, 2, OLED_8X16);
+			cnt = Get_Count();
+			OLED_ShowNum(56, 48, cnt/3600, 2, OLED_8X16);
+			OLED_ShowNum(80, 48, cnt%3600/60, 2, OLED_8X16);
+			OLED_ShowNum(104, 48, cnt%3600%60, 2, OLED_8X16);
 			if(!Count_Started)
 				OLED_ShowString(0, 32, "开始", OLED_8X16);
 			else
@@ -499,16 +504,18 @@ void Menu2_Clock(void){
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
-			OLED_ShowString(0, 0, "<-               ", OLED_8X16);
+			OLED_ShowString(0, 0, "<-              ", OLED_8X16);
 			OLED_ShowString(0, 16, "Date:XXXX-XX-XX", OLED_8X16);
 			OLED_ShowString(0, 32, "Time:XX:XX:XX  ", OLED_8X16);
-			OLED_ShowString(0, 48, "设置日期和时间  ", OLED_8X16);
+			OLED_ShowString(0, 48, "设置日期和时间    ", OLED_8X16);
+			OLED_ShowString(80, 0, "星期", OLED_8X16);
 			
 			OLED_ReverseArea(0, (CurrSelect2 - 1)*48, 128, 16);
 			OLED_Update();
 			CurrState = 1;
 		}else{
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*48)%64, 128, 16);
+			OLED_ClearArea(112, 0, 16, 16);
 			OLED_ClearArea(40, 16, 32, 16);
 			OLED_ClearArea(80, 16, 16, 16);
 			OLED_ClearArea(104, 16, 16, 16);
@@ -516,6 +523,31 @@ void Menu2_Clock(void){
 			OLED_ClearArea(64, 32, 16, 16);
 			OLED_ClearArea(88, 32, 16, 16); 
 			MyRTC_ReadTime();
+			
+			switch(MyRTC_Time.Weekday)
+			{
+				case 0:
+					OLED_ShowString(112, 0, "日", OLED_8X16);
+					break;
+				case 1:
+					OLED_ShowString(112, 0, "一", OLED_8X16);
+					break;
+				case 2:
+					OLED_ShowString(112, 0, "二", OLED_8X16);
+					break;
+				case 3:
+					OLED_ShowString(112, 0, "三", OLED_8X16);
+					break;
+				case 4:
+					OLED_ShowString(112, 0, "四", OLED_8X16);
+					break;
+				case 5:
+					OLED_ShowString(112, 0, "五", OLED_8X16);
+					break;
+				case 6:
+					OLED_ShowString(112, 0, "六", OLED_8X16);
+					break;
+			}
 			
 			OLED_ShowNum(40, 16, MyRTC_Time.Year, 4, OLED_8X16);
 			OLED_ShowNum(80, 16, MyRTC_Time.Month, 2, OLED_8X16);
@@ -525,6 +557,7 @@ void Menu2_Clock(void){
 			OLED_ShowNum(88, 32, MyRTC_Time.Second, 2, OLED_8X16);
 
 			OLED_ReverseArea(0, ((CurrSelect2 - 1)*48)%64, 128, 16);
+			OLED_UpdateArea(112, 0, 16, 16);
 			OLED_UpdateArea(40, 16, 32, 16);
 			OLED_UpdateArea(80, 16, 16, 16);
 			OLED_UpdateArea(104, 16, 16, 16);

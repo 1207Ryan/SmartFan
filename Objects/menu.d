@@ -33,10 +33,11 @@
 .\objects\menu.o: Hardware\OLED_Data.h
 .\objects\menu.o: Hardware\Key.h
 .\objects\menu.o: Hardware\Menu.h
-.\objects\menu.o: Hardware\LED.h
 .\objects\menu.o: Hardware\Motor.h
 .\objects\menu.o: .\System\MyRTC.h
 .\objects\menu.o: Hardware\AD.h
 .\objects\menu.o: Hardware\HC_SR04.h
 .\objects\menu.o: .\System\Count_Down.h
 .\objects\menu.o: .\System\Timer.h
+.\objects\menu.o: Hardware\Serial.h
+.\objects\menu.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h

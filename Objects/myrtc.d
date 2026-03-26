@@ -28,4 +28,5 @@
 .\objects\myrtc.o: .\Library\stm32f10x_usart.h
 .\objects\myrtc.o: .\Library\stm32f10x_wwdg.h
 .\objects\myrtc.o: .\Library\misc.h
+.\objects\myrtc.o: System\MyRTC.h
 .\objects\myrtc.o: D:\Keil5\ARM\ARMCC\Bin\..\include\time.h
