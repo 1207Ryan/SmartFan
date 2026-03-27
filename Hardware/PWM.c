@@ -41,5 +41,4 @@ void PWM_Init(void){
 
 void PWM_SetCompare1(uint16_t Compare){
 	TIM_SetCompare1(TIM2, Compare);
-	
 }

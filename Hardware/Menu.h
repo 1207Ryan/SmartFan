@@ -20,6 +20,7 @@ void Menu2_Temp(void);
 void Menu2_Fan(void);
 void Menu2_CountDown(void);
 void Menu2_Clock(void);
+void Menu2_Weather(void);
 void Menu2_Debug(void);
 
 void Menu3_CountDown(void);

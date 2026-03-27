@@ -10,6 +10,7 @@
 #include "Count_Down.h"
 #include "Timer.h"
 #include "Serial.h"
+#include "WIFI.h"
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -39,8 +40,8 @@ uint8_t Menu1(void){
 				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
 			else if(CurrSelect1 >=5 && CurrSelect1 <= 6){
-				OLED_ShowString(0, 0,  "调试             ", OLED_8X16);
-				OLED_ShowString(0, 16, "设置             ", OLED_8X16);
+				OLED_ShowString(0, 0,  "天气显示          ", OLED_8X16);
+				OLED_ShowString(0, 16, "调试             ", OLED_8X16);
 				OLED_ShowString(0, 32, "                ", OLED_8X16);
 				OLED_ShowString(0, 48, "                ", OLED_8X16);
 			}
@@ -90,6 +91,10 @@ uint8_t Menu1(void){
 				Menu2_Clock();
 				break;
 			case 5:
+				Menu1_Select = 0;
+				Menu2_Weather();
+				break;
+			case 6:
 				Menu1_Select = 0;
 				Menu2_Debug();
 				break;
@@ -609,9 +614,9 @@ void Menu3_SetDateAndTime(void){
 		if(CurrState == 0){
 			OLED_Clear();
 			OLED_ShowString(0, 0,  "<-            ", OLED_8X16);
-			OLED_ShowString(0, 16, "设置日期        ", OLED_8X16);
-			OLED_ShowString(0, 32, "设置时间        ", OLED_8X16);
-			OLED_ShowString(0, 48, "              ", OLED_8X16);
+			OLED_ShowString(0, 16, "自动校准        ", OLED_8X16);
+			OLED_ShowString(0, 32, "设置日期        ", OLED_8X16);
+			OLED_ShowString(0, 48, "设置时间        ", OLED_8X16);
 			
 			OLED_ReverseArea(0, (CurrSelect3 - 1)*16, 128, 16);
 			OLED_Update();
@@ -622,12 +627,12 @@ void Menu3_SetDateAndTime(void){
 			CurrState = 0;
 			CurrSelect3--;
 			if(CurrSelect3 <= 0){
-				CurrSelect3 = 3;
+				CurrSelect3 = 4;
 			}
 		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			CurrSelect3++;
-			if(CurrSelect3 > 3){
+			if(CurrSelect3 > 4){
 				CurrSelect3 = 1;
 			}
 		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
@@ -643,9 +648,17 @@ void Menu3_SetDateAndTime(void){
 				return;
 			case 2:
 				Menu3_Select = 0;
-				Menu4_SetDate();
+				OLED_ShowString(0, 0, "正在获取中……", OLED_8X16);
+				OLED_Update();
+				WIFI_GetTime();
+				OLED_Clear();
+				OLED_Update();
 				break;
 			case 3:
+				Menu3_Select = 0;
+				Menu4_SetDate();
+				break;
+			case 4:
 				Menu3_Select = 0;
 				Menu4_SetTime();
 				break;
@@ -861,6 +874,71 @@ void Menu4_SetTime(void){
 				Menu4_Select = 0;
 				MyRTC_Sub_1Second();
 				break;
+		}
+	}
+}
+
+/**
+  * @brief 时钟控制二级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu2_Weather(void){
+	uint8_t Menu2_Select = 0;
+	
+	OLED_ShowString(0, 0, "正在获取中……", OLED_8X16);
+	OLED_Update();
+	WIFI_GetWeather();
+	OLED_Clear();
+	OLED_Update();
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			OLED_ShowString(0, 0,  "<-            ", OLED_8X16);
+			OLED_ShowString(0, 16, "地点:福州市     ", OLED_8X16);
+			OLED_ShowString(0, 32, "温度:   ℃     ", OLED_8X16);
+			OLED_ShowString(0, 48, "天气:         ", OLED_8X16);
+			
+			OLED_ReverseArea(0, (CurrSelect2 - 1)*64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*48)%64, 128, 16);
+			OLED_ClearArea(40, 32, 16, 16);
+			OLED_ClearArea(40, 48, 32, 16);
+			
+			OLED_ShowNum(40, 32, weather_temp_u8, 2, OLED_8X16);
+			OLED_ShowString(40, 48, climate, OLED_8X16);
+
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*48)%64, 128, 16);
+			OLED_UpdateArea(40, 32, 16, 16);
+			OLED_UpdateArea(40, 48, 32, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect2--;
+			if(CurrSelect2 <= 0){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect2++;
+			if(CurrSelect2 > 1){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu2_Select = CurrSelect2;
+		}
+		
+		switch(Menu2_Select){
+			case 1:
+				Menu2_Select = 0;
+				return;
 		}
 	}
 }

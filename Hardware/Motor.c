@@ -6,6 +6,7 @@ PWMA - PA0
 AIN1 - PB0
 AIN2 - PB1
 */
+
 #define GPIO_Pin_AIN1 GPIO_Pin_0
 #define GPIO_Pin_AIN2 GPIO_Pin_1
 #define GPIO_Pin_Port GPIOB
@@ -29,8 +30,8 @@ void Motor_SetSpeed(int8_t Speed){
 		GPIO_ResetBits(GPIO_Pin_Port, GPIO_Pin_AIN2);
 		PWM_SetCompare1(Speed);
 	}else{
-		GPIO_SetBits(GPIOA,GPIO_Pin_AIN2);
-		GPIO_ResetBits(GPIOA,GPIO_Pin_AIN1);
+		GPIO_SetBits(GPIO_Pin_Port,GPIO_Pin_AIN2);
+		GPIO_ResetBits(GPIO_Pin_Port,GPIO_Pin_AIN1);
 		PWM_SetCompare1(-Speed);
 	}
 }
@@ -40,7 +41,7 @@ void Motor_SetGear(uint8_t Gear){
 }
 
 void Motor_Stop(void){
-	GPIO_SetBits(GPIO_Pin_Port, GPIO_Pin_AIN1);
-	GPIO_SetBits(GPIO_Pin_Port, GPIO_Pin_AIN2);
+	GPIO_ResetBits(GPIO_Pin_Port, GPIO_Pin_AIN1);
+	GPIO_ResetBits(GPIO_Pin_Port, GPIO_Pin_AIN2);
 	PWM_SetCompare1(0);
 }

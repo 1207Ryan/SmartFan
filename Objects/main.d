@@ -41,3 +41,4 @@
 .\objects\main.o: .\System\Count_Down.h
 .\objects\main.o: .\Hardware\Voice_Recognition.h
 .\objects\main.o: .\Hardware\Bluetooth.h
+.\objects\main.o: .\Hardware\WIFI.h
