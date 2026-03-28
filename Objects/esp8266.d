@@ -28,8 +28,9 @@
 .\objects\esp8266.o: .\Library\stm32f10x_usart.h
 .\objects\esp8266.o: .\Library\stm32f10x_wwdg.h
 .\objects\esp8266.o: .\Library\misc.h
-.\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdarg.h
+.\objects\esp8266.o: Hardware\Serial.h
 .\objects\esp8266.o: Hardware\ESP8266.h
-.\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\esp8266.o: .\System\Delay.h
 .\objects\esp8266.o: .\System\MyRTC.h
+.\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h

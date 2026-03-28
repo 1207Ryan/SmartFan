@@ -131,7 +131,7 @@ void TIM1_UP_IRQHandler(void){
 
 void Count_Down_Over(void)
 {
-	Serial_SendByte(0x2E);
-	Serial2_SendString("倒计时已结束");
-	Serial2_SendByte('\n');
+	Serial_SendByte(1, 0x2E);
+	Serial_SendString(2, "倒计时已结束");
+	Serial_SendByte(2, '\n');
 }

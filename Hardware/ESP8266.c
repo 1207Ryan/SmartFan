@@ -1,174 +1,229 @@
-#include "stm32f10x.h"                  // Device header
-#include "stdio.h"
-#include "stdarg.h"
+#include "stm32f10x.h"
+#include "Serial.h"
 #include "ESP8266.h"
-#include <string.h>
+#include "Delay.h"
 #include "MyRTC.h"
+#include <stdio.h>
+#include <string.h>
 
 /*
 ESP8266 Tx - Rx PB11
 ESP8266 Rx - Tx PB10
 */
 
-uint8_t Serial3_TxDataPacket[Serial3_SizeofTxPacket];
-uint8_t Serial3_RxDataPacket[Serial3_SizeofRxPacket];
-char Serial3_TxPacket[Serial3_SizeofTxPacket];
-char Serial3_RxPacket[Serial3_SizeofRxPacket];
-uint8_t Serial3_RxData;
-uint8_t Serial3_RxFlag;
-uint8_t Serial3_PassFlag =0;
-static uint16_t RxNumber = 0;
-uint16_t Serial3_RxLen = 0;
+long long int time;
+uint16_t code;
+int temperature;
+uint8_t weather_temp_u8;
+char climate[10];
+void Weather_Parse(void);
 
-void Serial3_Init(void)
+void ESP8266_Init(void)
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-	//TX
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;//推挽输出
-	GPIO_InitStructure.GPIO_Pin = TX_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(TX_PORT, &GPIO_InitStructure);
-	
-	//RX
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//上拉输入
-	GPIO_InitStructure.GPIO_Pin = RX_PIN;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(RX_PORT, &GPIO_InitStructure);
-	
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_Init(USART3, &USART_InitStructure);
-	
-	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-	
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority =1;
-	NVIC_Init(&NVIC_InitStructure);
-	
-	USART_Cmd(USART3, ENABLE);
-}
+	Serial_Init(3);
+	Delay_ms(1000);
 
-void Serial3_SendByte(uint8_t Byte)//发送字节数据
-{
-	USART_SendData(USART3, Byte);
-	while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);	
-	//判断TXE是否置1，即数据是否从发送数据寄存器转移到发送移位寄存器
-	//标志寄存器会自动清零
-	
-}
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "+++");//退出透传模式
 
-void Serial3_SendArray(uint8_t *Array, uint16_t length)
-{
-	for(uint8_t i=0; i<length; i++)
-	{
-		Serial3_SendByte(Array[i]);
+	Delay_ms(1000);
+
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT\r\n");//AT测试
+
+	Delay_ms(2000);
+
+	if (strstr(Serial3_RxPacket,"OK\r\n") == NULL){//模块异常
+		return;
 	}
-}
 
-void Serial3_SendString(char* String)
-{
-	for(uint16_t i=0; String[i] != '\0'; i++)
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+RST\r\n");//模块复位
+	Delay_ms(1500);
+
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CWMODE=1\r\n");//开始连接wifi
+	Delay_ms(1000);
+
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CWJAP=\"Ryan\",\"ryh031207\"\r\n");//正在连接wifi...
+
+	// 轮询检测WiFi连接状态
+	uint8_t conn_flag = 0;
+	uint8_t ip_flag = 0;
+	unsigned int start_time = 0;
+		
+	while(start_time < 10000)
 	{
-		Serial3_SendByte(String[i]);
-	}
-}
-
-void Serial3_SendNumber(uint32_t Number)
-{
-	uint32_t mask =1;//位数
-	uint32_t tem =Number;
-	for(; tem>9; mask*=10)
-	{
-		tem /=10;
-	}
-	
-	for(; Number!=0; Number%=mask,mask/=10)
-	{
-		Serial3_SendByte(Number/mask+'0');//从高位开始发
-	}
-}
-
-int fputc3(int ch, FILE *f)
-{
-	Serial3_SendByte(ch);
-	return ch;
-}
-
-void Serial3_Printf(char *format, ...)//可变参数
-{
-	char String[100];
-	va_list arg;
-	va_start(arg, format);
-	vsprintf(String, format, arg);
-	va_end(arg);//释放参数表
-	Serial3_SendString(String);
-}
-
-uint8_t Serial3_GetRxFlag(void)
-{
-	if(Serial3_RxFlag == 1)
-	{
-		Serial3_RxFlag =0;
-		return 1;
-	}
-	return 0;
-}
-
-uint8_t Serial3_GetRxData(void)
-{
-	return Serial3_RxData;
-}
-
-void Serial3_SendPacket(void)
-{
-	Serial3_SendByte(0xFF);
-	Serial3_SendArray(Serial3_TxDataPacket, Serial3_SizeofTxPacket);
-	Serial3_SendByte(0xFE);
-}
-
-uint8_t Serial3_GetRxPacketLength(void)
-{
-	return RxNumber;
-}
-
-// 获取接收长度
-uint16_t Serial3_GetRxLength(void)
-{
-    return Serial3_RxLen;
-}
-
-// 清空接收缓冲区
-void Serial3_ClearRxBuffer(void)
-{
-	RxNumber = 0;
-    Serial3_RxLen = 0;           // 接收长度归零
-    Serial3_RxFlag = 0;          // 接收标志归零
-    memset(Serial3_RxPacket, 0, Serial3_SizeofRxPacket);  // 清空
-}
-
-void USART3_IRQHandler(void)
-{
-    if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
-    { 
-        Serial3_RxPacket[RxNumber++] = USART_ReceiveData(USART3);
-		if (RxNumber >= Serial3_SizeofRxPacket - 1){
-			RxNumber = 0;
+		if(strstr(Serial3_RxPacket, "WIFI CONNECTED") != NULL) 
+			conn_flag = 1;
+		if(strstr(Serial3_RxPacket, "WIFI GOT IP") != NULL) 
+			ip_flag = 1;
+		if(conn_flag && ip_flag) {	// 两个标识都出现，提前退出轮询
+			break;
 		}
-        
-        Serial3_RxFlag = 1;   // 一直标记收到数据
-        USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-    }
+		Delay_ms(10);
+		start_time += 10;
+	}
+
+	if(!conn_flag || !ip_flag){
+		//WiFi连接失败，超时/参数错误
+		return;
+	}
+
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPMUX=0\r\n");//开启单连接模式
+
+	Delay_ms(800);
+	if (strstr(Serial3_RxPacket,"OK\r\n") == NULL){
+		//单连接模式异常
+		return;
+	}
+	Delay_ms(1000);
+}
+
+// 获取网络时间（拼多多API，老固件可用）
+void ESP8266_GetTime(void)
+{
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPSTART=\"TCP\",\"api.pinduoduo.com\",80\r\n");
+	
+	Delay_ms(1000);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPMODE=1\r\n");
+	Delay_ms(800);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPSEND\r\n");
+	Delay_ms(800);
+	
+	Serial_SendString(3, "GET http://api.pinduoduo.com/api/server/_stm\r\n");
+	Delay_ms(1000);
+	
+	char *p = NULL;
+	uint8_t time_out = 0;
+	
+	while (time_out < 20)
+	{
+		p = strstr(Serial3_RxPacket, "server_time");
+		if (p != NULL)
+		{
+			sscanf(p + 13, "%lld", &time);
+			RTC_SetCounter(time / 1000);
+			RTC_WaitForLastTask();
+			break;
+		}
+		
+		Delay_ms(100);
+		time_out++;
+	}
+	
+	Serial_SendString(3, "+++");
+	Delay_ms(1000);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPCLOSE\r\n");
+	Delay_ms(1000);
+}
+
+// 获取福州天气（心知天气）
+void ESP8266_GetWeather(void)
+{
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPSTART=\"TCP\",\"api.seniverse.com\",80\r\n");
+	Delay_ms(1000);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPMODE=1\r\n");
+	Delay_ms(800);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPSEND\r\n");
+	Delay_ms(800);
+	
+	// 福州正确请求（无https + 正确格式）
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "GET https://api.seniverse.com/v3/weather/now.json?key=SEyv448ckBXofHyY9&location=fujian fuzhou&language=en&unit=c\r\n");
+	Delay_ms(1200);
+	
+	char *p = NULL;
+	int c;
+	uint8_t time_out = 0;
+	uint8_t flag1 = 0;
+	uint8_t flag2 = 0;
+	
+	while (time_out < 50)
+	{
+		// 天气代码
+		p=strstr (Serial3_RxPacket,"code");
+		if (p!=NULL)
+		{
+			sscanf (p+7,"%d",&c);
+			code = (uint16_t)c;
+			Weather_Parse();
+			flag1 = 1;
+		}
+
+		// 温度（uint8_t）
+		p=strstr (Serial3_RxPacket,"temperature");
+		if (p!=NULL)
+		{
+			sscanf (p+14,"%d",&temperature);
+			weather_temp_u8 = (uint8_t)temperature;
+			flag2 = 1;
+		}
+		
+		if(flag1 && flag2)
+			break;
+		
+		Delay_ms(100);
+		time_out++;
+	}
+	
+	Serial_SendString(3, "+++");
+	Delay_ms(1000);
+	
+	Serial_ClearRxBuffer(3);
+	Serial_SendString(3, "AT+CIPCLOSE\r\n");
+	Delay_ms(1000);
+}
+
+void Weather_Parse(void)
+{
+	switch (code)
+	{
+		case 0:strcpy (climate,"晴");break;
+		case 1:strcpy (climate,"晴");break;
+		case 2:strcpy (climate,"晴");break;
+		case 3:strcpy (climate,"晴");break;
+		case 4:strcpy (climate,"多云");break;
+		case 5:strcpy (climate,"多云");break;
+		case 6:strcpy (climate,"多云");break;
+		case 7:strcpy (climate,"多云");break;
+		case 8:strcpy (climate,"多云");break;
+		case 9:strcpy (climate,"阴");break;
+		case 10:strcpy (climate,"阵雨");break;
+		case 11:strcpy (climate,"雷阵雨");break;
+		case 12:strcpy (climate,"雷阵雨");break;
+		case 13:strcpy (climate,"小雨");break;
+		case 14:strcpy (climate,"中雨");break;
+		case 15:strcpy (climate,"大雨");break;
+		case 16:strcpy (climate,"暴雨");break;
+		case 17:strcpy (climate,"大暴雨");break;
+		case 18:strcpy (climate,"大暴雨");break;
+		case 19:strcpy (climate,"冻雨");break;
+		case 20:strcpy (climate,"雨夹雪");break;
+		case 21:strcpy (climate,"阵雪");break;
+		case 22:strcpy (climate,"小雪");break;
+		case 23:strcpy (climate,"中雪");break;
+		case 24:strcpy (climate,"大雪");break;
+		case 25:strcpy (climate,"暴雪");break;
+		case 30:strcpy (climate,"雾");break;
+		case 31:strcpy (climate,"霾");break;
+		case 32:strcpy (climate,"风");break;
+		case 33:strcpy (climate,"大风");break;
+		case 37:strcpy (climate,"冷");break;
+		case 38:strcpy (climate,"热");break;
+	}
 }

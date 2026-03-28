@@ -17,7 +17,7 @@ STM32 PA10 - ASRPRO PB5/PA2
 0x11:升档	0x12:降档	0x13:报档位	0x14:距离过近提示
 0x2C:设置倒计时	依次说 小时：分钟：秒钟 每个块对应一个时间	0x2D:开始倒计时
 0x20 ~ 0x2B 对应0 ~ 55
-0x31:报时
+0x31:报时	0x32:联网校准时间		0x33:播报天气
 */
 
 uint8_t RxData;
@@ -34,13 +34,13 @@ uint8_t High_Byte;
 uint8_t Low_Byte;
 
 void Voice_Recognition_Init(void){
-	Serial_Init();
+	Serial_Init(1);
 }
 
 void Voice_Recognition(void){
-	if(Serial_GetRxFlag() == 1)
+	if(Serial_GetRxFlag(1) == 1)
 	{
-		RxData =Serial_GetRxData();
+		RxData =Serial_GetRxData(1);
 		//Serial_SendByte(RxData);
 		switch(RxData){
 			case 0x01:	//开启温度调节
@@ -59,15 +59,15 @@ void Voice_Recognition(void){
 				Motor_Stop();
 				break;
 			case 0x03:	//报温度
-				Serial_SendByte(RxData);
+				Serial_SendByte(1, RxData);
 				// 1. 提取整数位（直接强制类型转换）
 				temp_int = (uint8_t)Temp; // 25.6 → 25
                 // 2. 提取小数位（放大10倍后取余，保留1位）
                 temp_dec = (uint8_t)((Temp - temp_int) * 10); // 25.6-25=0.6 → 0.6×10=6
 			
-				Serial_SendByte(temp_int);  // 第一次发送：整数位（25 → 0x19）
+				Serial_SendByte(1, temp_int);  // 第一次发送：整数位（25 → 0x19）
                 Delay_ms(1);                // 短暂延时，避免接收端粘包（可选）
-                Serial_SendByte(temp_dec);  // 第二次发送：小数位（6 → 0x06）
+                Serial_SendByte(1, temp_dec);  // 第二次发送：小数位（6 → 0x06）
 				break;
 			case 0x11:
 				Temp2Gear = 0;
@@ -90,8 +90,8 @@ void Voice_Recognition(void){
 				if(Gear == 0) Working = 0;
 				break;
 			case 0x13:
-				Serial_SendByte(RxData);
-                Serial_SendByte(Gear);  
+				Serial_SendByte(1, RxData);
+                Serial_SendByte(1, Gear);  
 				break;
 			case 0x2C:
 				Count_Set_0();
@@ -310,12 +310,29 @@ void Voice_Recognition(void){
 				Serial_TxPacket[6] = MyRTC_Time.Minute;
 				Serial_TxPacket[7] = MyRTC_Time.Second;
 				
-				Serial_SendPacket();
+				Serial_SendPacket(1);
+				break;
+			case 0x32:
+				MyRTC_ReadTime();
+				
+				memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				
+				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
+				Serial_TxPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
+				Serial_TxPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
+				Serial_TxPacket[2] = MyRTC_Time.Month;
+				Serial_TxPacket[3] = MyRTC_Time.Day;
+				Serial_TxPacket[4] = MyRTC_Time.Weekday;
+				Serial_TxPacket[5] = MyRTC_Time.Hour;
+				Serial_TxPacket[6] = MyRTC_Time.Minute;
+				Serial_TxPacket[7] = MyRTC_Time.Second;
+				
+				Serial_SendPacket(1);
 				break;
 		}
 	}
 }
 
 void Distance_Warn(void){
-	Serial_SendByte(0x14);
+	Serial_SendByte(1, 0x14);
 }

@@ -10,7 +10,7 @@
 #include "Count_Down.h"
 #include "Timer.h"
 #include "Serial.h"
-#include "WIFI.h"
+#include "ESP8266.h"
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -174,7 +174,7 @@ void Menu2_Temp(){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
-				Serial_SendByte(0x01);
+				Serial_SendByte(1, 0x01);
 				Menu2_Select = 0;
 				break;
 			case 3:		//停止风扇
@@ -185,7 +185,7 @@ void Menu2_Temp(){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Serial_SendByte(0x02);
+				Serial_SendByte(1, 0x02);
 				Menu2_Select = 0;
 				break;
 //			case 4:		
@@ -272,7 +272,7 @@ void Menu2_Fan(void){
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
-				Serial_SendByte(0x11);
+				Serial_SendByte(1, 0x11);
 				Menu2_Select = 0;
 				break;
 			case 3:		//降档
@@ -284,7 +284,7 @@ void Menu2_Fan(void){
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
 				if(Gear == 0) Working = 0;
-				Serial_SendByte(0x12);
+				Serial_SendByte(1, 0x12);
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
@@ -650,7 +650,7 @@ void Menu3_SetDateAndTime(void){
 				Menu3_Select = 0;
 				OLED_ShowString(0, 0, "正在获取中……", OLED_8X16);
 				OLED_Update();
-				WIFI_GetTime();
+				ESP8266_GetTime();
 				OLED_Clear();
 				OLED_Update();
 				break;
@@ -888,7 +888,7 @@ void Menu2_Weather(void){
 	
 	OLED_ShowString(0, 0, "正在获取中……", OLED_8X16);
 	OLED_Update();
-	WIFI_GetWeather();
+	ESP8266_GetWeather();
 	OLED_Clear();
 	OLED_Update();
 	

@@ -28,6 +28,15 @@
 .\objects\hc_04.o: .\Library\stm32f10x_usart.h
 .\objects\hc_04.o: .\Library\stm32f10x_wwdg.h
 .\objects\hc_04.o: .\Library\misc.h
+.\objects\hc_04.o: Hardware\Serial.h
+.\objects\hc_04.o: .\System\Delay.h
+.\objects\hc_04.o: Hardware\Menu.h
+.\objects\hc_04.o: Hardware\Motor.h
+.\objects\hc_04.o: .\System\MyRTC.h
+.\objects\hc_04.o: Hardware\AD.h
+.\objects\hc_04.o: Hardware\HC_SR04.h
+.\objects\hc_04.o: .\System\Count_Down.h
+.\objects\hc_04.o: .\System\Timer.h
+.\objects\hc_04.o: Hardware\Voice_Recognition.h
 .\objects\hc_04.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\hc_04.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdarg.h
-.\objects\hc_04.o: Hardware\HC_04.h
+.\objects\hc_04.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h

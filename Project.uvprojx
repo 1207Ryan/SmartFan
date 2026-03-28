@@ -491,16 +491,6 @@
               <FilePath>.\Hardware\HC_04.h</FilePath>
             </File>
             <File>
-              <FileName>Bluetooth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\Bluetooth.c</FilePath>
-            </File>
-            <File>
-              <FileName>Bluetooth.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\Bluetooth.h</FilePath>
-            </File>
-            <File>
               <FileName>ESP8266.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\ESP8266.c</FilePath>
@@ -509,16 +499,6 @@
               <FileName>ESP8266.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\ESP8266.h</FilePath>
-            </File>
-            <File>
-              <FileName>WIFI.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\WIFI.c</FilePath>
-            </File>
-            <File>
-              <FileName>WIFI.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\WIFI.h</FilePath>
             </File>
           </Files>
         </Group>

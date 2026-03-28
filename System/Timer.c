@@ -6,7 +6,7 @@
 #include "HC_SR04.h"
 #include "Motor.h"
 #include "Voice_Recognition.h"
-#include "Bluetooth.h"
+#include "HC_04.h"
 #include "MyRTC.h"
 
 #define WARN_INTERVAL 5    // 警告间隔：5秒
@@ -132,7 +132,7 @@ void TIM3_IRQHandler(void){
 		if(refresh_tick %10 == 0){
 			// 10ms
 			Voice_Recognition();
-			Bluetooth();
+			HC_04_Detect();
 		}
 		
 		

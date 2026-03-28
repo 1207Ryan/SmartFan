@@ -40,5 +40,4 @@
 .\objects\menu.o: .\System\Count_Down.h
 .\objects\menu.o: .\System\Timer.h
 .\objects\menu.o: Hardware\Serial.h
-.\objects\menu.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\menu.o: Hardware\WIFI.h
+.\objects\menu.o: Hardware\ESP8266.h

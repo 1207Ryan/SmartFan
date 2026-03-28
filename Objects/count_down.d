@@ -31,5 +31,4 @@
 .\objects\count_down.o: .\Hardware\Motor.h
 .\objects\count_down.o: .\Hardware\Voice_Recognition.h
 .\objects\count_down.o: .\Hardware\Serial.h
-.\objects\count_down.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\count_down.o: .\Hardware\HC_04.h

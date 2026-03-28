@@ -29,7 +29,6 @@
 .\objects\voice_recognition.o: .\Library\stm32f10x_wwdg.h
 .\objects\voice_recognition.o: .\Library\misc.h
 .\objects\voice_recognition.o: Hardware\Serial.h
-.\objects\voice_recognition.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\voice_recognition.o: .\System\Delay.h
 .\objects\voice_recognition.o: Hardware\Menu.h
 .\objects\voice_recognition.o: Hardware\Motor.h
