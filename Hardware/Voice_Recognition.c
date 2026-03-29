@@ -9,6 +9,7 @@
 #include "Count_Down.h"
 #include "Timer.h"
 #include <string.h> 
+#include "ESP8266.h"
 
 /*
 STM32 PA9 - ASRPRO PB6/PA3
@@ -298,36 +299,43 @@ void Voice_Recognition(void){
 			case 0x31:
 				MyRTC_ReadTime();
 				
-				memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
 				
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
-				Serial_TxPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
-				Serial_TxPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
-				Serial_TxPacket[2] = MyRTC_Time.Month;
-				Serial_TxPacket[3] = MyRTC_Time.Day;
-				Serial_TxPacket[4] = MyRTC_Time.Weekday;
-				Serial_TxPacket[5] = MyRTC_Time.Hour;
-				Serial_TxPacket[6] = MyRTC_Time.Minute;
-				Serial_TxPacket[7] = MyRTC_Time.Second;
+				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
+				Serial_TxDataPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
+				Serial_TxDataPacket[2] = MyRTC_Time.Month;
+				Serial_TxDataPacket[3] = MyRTC_Time.Day;
+				Serial_TxDataPacket[4] = MyRTC_Time.Weekday;
+				Serial_TxDataPacket[5] = MyRTC_Time.Hour;
+				Serial_TxDataPacket[6] = MyRTC_Time.Minute;
+				Serial_TxDataPacket[7] = MyRTC_Time.Second;
 				
-				Serial_SendPacket(1);
+				Serial_SendPacket(1, 8);
 				break;
 			case 0x32:
+				ESP8266_GetTime();
 				MyRTC_ReadTime();
 				
-				memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
 				
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
-				Serial_TxPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
-				Serial_TxPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
-				Serial_TxPacket[2] = MyRTC_Time.Month;
-				Serial_TxPacket[3] = MyRTC_Time.Day;
-				Serial_TxPacket[4] = MyRTC_Time.Weekday;
-				Serial_TxPacket[5] = MyRTC_Time.Hour;
-				Serial_TxPacket[6] = MyRTC_Time.Minute;
-				Serial_TxPacket[7] = MyRTC_Time.Second;
+				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
+				Serial_TxDataPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
+				Serial_TxDataPacket[2] = MyRTC_Time.Month;
+				Serial_TxDataPacket[3] = MyRTC_Time.Day;
+				Serial_TxDataPacket[4] = MyRTC_Time.Weekday;
+				Serial_TxDataPacket[5] = MyRTC_Time.Hour;
+				Serial_TxDataPacket[6] = MyRTC_Time.Minute;
+				Serial_TxDataPacket[7] = MyRTC_Time.Second;
 				
-				Serial_SendPacket(1);
+				Serial_SendPacket(1, 8);
+				break;
+			case 0x33:
+				ESP8266_GetWeather();
+				Serial_SendByte(1, weather_temp_u8);
+				Delay_ms(1);
+				Serial_SendByte(1, weather_code);
 				break;
 		}
 	}

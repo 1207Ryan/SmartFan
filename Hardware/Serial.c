@@ -217,21 +217,19 @@ uint8_t Serial_GetRxFlag(uint8_t usartx)
 			Serial1_RxFlag =0;
 			return 1;
 		}
-		return 0;
 	}else if(usartx == 2){
 		if(Serial2_RxFlag == 1){
 			Serial2_RxFlag =0;
 			return 1;
 		}
-		return 0;
+		
 	}else if(usartx == 3){
 		if(Serial3_RxFlag == 1){
 			Serial3_RxFlag =0;
 			return 1;
 		}
-		return 0;
 	}
-	
+	return 0;
 }
 
 uint8_t Serial_GetRxData(uint8_t usartx)
@@ -243,12 +241,13 @@ uint8_t Serial_GetRxData(uint8_t usartx)
 	}else if(usartx == 3){
 		return Serial3_RxData;
 	}
+	return 0;
 }
 
-void Serial_SendPacket(uint8_t usartx)
+void Serial_SendPacket(uint8_t usartx, uint16_t length)
 {
 	Serial_SendByte(usartx, 0xFF);
-	Serial_SendArray(usartx, Serial_TxDataPacket, Serial_SizeofTxPacket);
+	Serial_SendArray(usartx, Serial_TxDataPacket, length);
 	Serial_SendByte(usartx, 0xFE);
 }
 
@@ -261,6 +260,7 @@ uint16_t Serial_GetRxPacketLength(uint8_t usartx)
 	}else if(usartx == 3){
 		return Serial3_RxLen;
 	}
+	return 0;
 }
 
 // 清空接收缓冲区
@@ -279,7 +279,6 @@ void Serial_ClearRxBuffer(uint8_t usartx)
 		Serial3_RxFlag = 0;          // 接收标志归零
 		memset(Serial3_RxPacket, 0, Serial_SizeofRxPacket);  // 清空
 	}
-	
 }
 
 void USART1_IRQHandler(void)

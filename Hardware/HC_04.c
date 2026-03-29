@@ -40,8 +40,7 @@ void HC_04_Init(void){
 }
 
 void HC_04_Detect(void){
-	if(Serial_GetRxFlag(2) == 1)
-	{
+	if(Serial_GetRxFlag(2) == 1){
 		RxData2 =Serial_GetRxData(2);
 		//Serial_SendByte(RxData);
 		switch(RxData2){
@@ -51,6 +50,8 @@ void HC_04_Detect(void){
 				Temp2Gear = 1;
 				Last_Gear = 0;
 				Serial_SendByte(1, 0x01);
+				Serial_SendString(2, "风扇已开启");
+                Serial_SendByte(2, '\n');
 				break;
 			case 0x02:	//关闭温度调节
 				AD_Collect_Stop();
@@ -61,6 +62,8 @@ void HC_04_Detect(void){
 				Last_Gear = 0;
 				Motor_Stop();
 				Serial_SendByte(1, 0x02);
+				Serial_SendString(2, "风扇已关闭");
+                Serial_SendByte(2, '\n');
 				break;
 			case 0x03:	//报温度
 				// 1. 提取整数位（直接强制类型转换）
@@ -208,19 +211,17 @@ void HC_04_Detect(void){
                 Serial_SendByte(2, '\n');
 				
 				Serial_SendByte(1, 0x31);
-				memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
-				
+				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
-				Serial_TxPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
-				Serial_TxPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
-				Serial_TxPacket[2] = MyRTC_Time.Month;
-				Serial_TxPacket[3] = MyRTC_Time.Day;
-				Serial_TxPacket[4] = MyRTC_Time.Weekday;
-				Serial_TxPacket[5] = MyRTC_Time.Hour;
-				Serial_TxPacket[6] = MyRTC_Time.Minute;
-				Serial_TxPacket[7] = MyRTC_Time.Second;
-				
-				Serial_SendPacket(1);
+				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
+				Serial_TxDataPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
+				Serial_TxDataPacket[2] = MyRTC_Time.Month;
+				Serial_TxDataPacket[3] = MyRTC_Time.Day;
+				Serial_TxDataPacket[4] = MyRTC_Time.Weekday;
+				Serial_TxDataPacket[5] = MyRTC_Time.Hour;
+				Serial_TxDataPacket[6] = MyRTC_Time.Minute;
+				Serial_TxDataPacket[7] = MyRTC_Time.Second;
+				Serial_SendPacket(1, 8);
 				break;
 		}
 	}

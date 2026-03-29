@@ -1473,6 +1473,33 @@ void OLED_DrawArc(int16_t X, int16_t Y, uint8_t Radius, int16_t StartAngle, int1
 	}
 }
 
+/******************************************
+ 函 数 名：OLED_DrawBar
+ 功    能：在指定位置画水平进度条
+ 参    数：x,y    左上角坐标
+          width  进度条总宽度
+          height 进度条高度
+          value  当前值（0~100）
+******************************************/
+void OLED_DrawBar(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t value)
+{
+    uint8_t fill_wid = 0;
+    
+    // 限制范围 0~100
+    if(value > 100) value = 100;
+    
+    // 计算填充宽度
+    fill_wid = (width * value) / 100;
+    
+    // 画外框
+    OLED_DrawRectangle(x, y, width, height, 0);
+    
+    // 画填充
+    if(fill_wid > 0)
+    {
+        OLED_DrawRectangle(x+1, y+1, fill_wid-2, height-2, 1);
+    }
+}
 /*********************功能函数*/
 
 

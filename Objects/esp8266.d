@@ -34,3 +34,5 @@
 .\objects\esp8266.o: .\System\MyRTC.h
 .\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\esp8266.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\esp8266.o: Hardware\OLED.h
+.\objects\esp8266.o: Hardware\OLED_Data.h

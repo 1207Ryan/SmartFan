@@ -45,7 +45,7 @@ void Serial_Printf(uint8_t usartx, char *format, ...);
 uint8_t Serial_GetRxFlag(uint8_t usartx);
 uint8_t Serial_GetRxData(uint8_t usartx);
 uint16_t Serial_GetRxPacketLength(uint8_t usartx);
-void Serial_SendPacket(uint8_t usartx);
+void Serial_SendPacket(uint8_t usartx, uint16_t);
 void Serial_ClearRxBuffer(uint8_t usartx);
 
 #endif

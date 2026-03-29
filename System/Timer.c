@@ -44,7 +44,7 @@ void Timer_Init(void){
 	NVIC_InitTypeDef NVIC_InitStruct;
 	NVIC_InitStruct.NVIC_IRQChannel = TIM3_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;
+	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;	//抢占
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
 	NVIC_Init(&NVIC_InitStruct);
 	
@@ -134,9 +134,5 @@ void TIM3_IRQHandler(void){
 			Voice_Recognition();
 			HC_04_Detect();
 		}
-		
-		
 	}
 }
-
-

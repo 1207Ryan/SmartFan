@@ -38,3 +38,4 @@
 .\objects\voice_recognition.o: .\System\Count_Down.h
 .\objects\voice_recognition.o: .\System\Timer.h
 .\objects\voice_recognition.o: D:\Keil5\ARM\ARMCC\Bin\..\include\string.h
+.\objects\voice_recognition.o: Hardware\ESP8266.h

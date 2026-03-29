@@ -1,0 +1,4 @@
+access_key：/VWxX33Xd6fZ6dU5qT1Ti0fNw1FDH5Fd1VV5FyFv8cc=
+产品ID：8tlBI09Tt2/devices
+设备ID：SmartFan
+token：version=2018-10-31&res=products%2F8tlBI09Tt2%2Fdevices%2FSmartFan&et=1806327826&method=md5&sign=wHJJUlGtfg4cJ6GadeqtmA%3D%3D
