@@ -18,6 +18,12 @@ uint8_t CurrSelect3 = 1;
 uint8_t CurrSelect4 = 1;
 uint8_t CurrState = 0;
 
+float Temp_Gear_1 = 20.0f;  // 1档温度阈值
+float Temp_Gear_2 = 28.0f;  // 2档温度阈值
+float Temp_Gear_3 = 36.0f;  // 3档温度阈值
+float Temp_Gear_4 = 44.0f;  // 4档温度阈值
+float Temp_Gear_5 = 52.0f;  // 5档温度阈值
+
 volatile uint8_t Working = 0;
 volatile uint8_t Gear;
 volatile uint8_t Last_Gear;
@@ -39,11 +45,11 @@ uint8_t Menu1(void){
 				OLED_ShowString(0, 32, "倒计时               	", OLED_8X16);
 				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
-			else if(CurrSelect1 >=5 && CurrSelect1 <= 6){
-				OLED_ShowString(0, 0,  "天气显示          ", OLED_8X16);
-				OLED_ShowString(0, 16, "调试             ", OLED_8X16);
-				OLED_ShowString(0, 32, "                ", OLED_8X16);
-				OLED_ShowString(0, 48, "                ", OLED_8X16);
+			else if(CurrSelect1 >=5 && CurrSelect1 <= 7){
+				OLED_ShowString(0, 0,  "天气显示        	  ", OLED_8X16);
+				OLED_ShowString(0, 16, "调整温度阈值     	  ", OLED_8X16);
+				OLED_ShowString(0, 32, "调试               ", OLED_8X16);
+				OLED_ShowString(0, 48, "                  ", OLED_8X16);
 			}
 
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
@@ -56,14 +62,14 @@ uint8_t Menu1(void){
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			CurrSelect1--;
 			if(CurrSelect1 <= 0){
-				CurrSelect1=TotalSelect;
+				CurrSelect1 = TotalSelect;
 			}
 		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
 			CurrSelect1++;
 			if(CurrSelect1 > TotalSelect){
-				CurrSelect1=1;
+				CurrSelect1 = 1;
 			}
 		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
 			CurrState = 0;
@@ -95,6 +101,10 @@ uint8_t Menu1(void){
 				Menu2_Weather();
 				break;
 			case 6:
+				Menu1_Select = 0;
+				Menu2_SetTempThreshold();
+				break;
+			case 7:
 				Menu1_Select = 0;
 				Menu2_Debug();
 				break;
@@ -939,6 +949,184 @@ void Menu2_Weather(void){
 			case 1:
 				Menu2_Select = 0;
 				return;
+		}
+	}
+}
+
+/**
+  * @brief 温度阈值设置二级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu2_SetTempThreshold(void){
+	uint8_t Menu2_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "5档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 32, "4档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 48, "3档阈值: XX.X ℃   ", OLED_8X16);
+			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 7){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "2档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 32, "1档阈值: XX.X ℃   ", OLED_8X16);
+			}
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				OLED_ClearArea(64, 48, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Temp_Gear_5, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Gear_4, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+				OLED_UpdateArea(64, 48, 48, 16);
+			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 7){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Temp_Gear_2, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Gear_1, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+			}
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect2--;
+			if(CurrSelect2 <= 0){
+				CurrSelect2 = 7;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect2++;
+			if(CurrSelect2 > 7){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu2_Select = CurrSelect2;
+		}
+		
+		switch(Menu2_Select){
+			case 1:
+				Menu2_Select = 0;
+				CurrSelect2 = 1;
+				return;
+			case 2:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold(5);
+				break;
+			case 3:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold(4);
+				break;
+			case 4:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold(3);
+				return;
+			case 5:
+				Menu2_Select = 0;
+				CurrSelect2 = 1;
+				return;
+			case 6:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold(2);
+				break;
+			case 7:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold(1);
+				return;
+		}
+	}
+}
+
+/**
+  * @brief 温度阈值设置三级菜单
+  * @param 设置的温度阈值
+  * @retval 无
+  */
+void Menu3_SetTempThreshold(uint8_t TempThresHold_x){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect3>=1 && CurrSelect3<=3){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "阈值+0.5        ", OLED_8X16);
+				OLED_ShowString(0, 32, "阈值-0.5        ", OLED_8X16);
+			}
+			OLED_ShowNum(0, 48, TempThresHold_x, 1, OLED_8X16);
+			OLED_ShowString(8, 48, "档阈值: XX.X ℃  ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(64, 48, 48, 16); 
+			
+			switch(TempThresHold_x){
+				case 1:OLED_ShowFloatNum(64, 48, Temp_Gear_1, 2, 1, OLED_8X16);break;
+				case 2:OLED_ShowFloatNum(64, 48, Temp_Gear_2, 2, 1, OLED_8X16);break;
+				case 3:OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);break;
+				case 4:OLED_ShowFloatNum(64, 48, Temp_Gear_4, 2, 1, OLED_8X16);break;
+				case 5:OLED_ShowFloatNum(64, 48, Temp_Gear_5, 2, 1, OLED_8X16);break;
+			}
+
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(64, 48, 48, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 3){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 2:
+				Menu3_Select = 0;
+				TempThreshold_Add(TempThresHold_x);
+				break;
+			case 3:
+				Menu3_Select = 0;
+				TempThreshold_Sub(TempThresHold_x);
+				break;
 		}
 	}
 }

@@ -205,3 +205,33 @@ float AD_to_Temp(void)
     
     return Temp_Value;
 }
+
+void TempThreshold_Add(uint8_t TempThresHold_x){
+	switch(TempThresHold_x){
+		case 1:Temp_Gear_1 += 0.5;break;
+		case 2:Temp_Gear_2 += 0.5;break;
+		case 3:Temp_Gear_3 += 0.5;break;
+		case 4:Temp_Gear_4 += 0.5;break;
+		case 5:Temp_Gear_5 += 0.5;break;
+	}
+}
+
+void TempThreshold_Sub(uint8_t TempThresHold_x){
+	switch(TempThresHold_x){
+		case 1:Temp_Gear_1 -= 0.5;break;
+		case 2:Temp_Gear_2 -= 0.5;break;
+		case 3:Temp_Gear_3 -= 0.5;break;
+		case 4:Temp_Gear_4 -= 0.5;break;
+		case 5:Temp_Gear_5 -= 0.5;break;
+	}
+}
+
+void TempThreshold_Set(uint8_t TempThresHold_x, float Threshold){
+	switch(TempThresHold_x){
+		case 1:Temp_Gear_1 = Threshold;break;
+		case 2:Temp_Gear_2 = Threshold;break;
+		case 3:Temp_Gear_3 = Threshold;break;
+		case 4:Temp_Gear_4 = Threshold;break;
+		case 5:Temp_Gear_5 = Threshold;break;
+	}
+}

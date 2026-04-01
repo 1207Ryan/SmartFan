@@ -35,5 +35,7 @@
 .\objects\timer.o: .\Hardware\HC_SR04.h
 .\objects\timer.o: .\Hardware\Motor.h
 .\objects\timer.o: .\Hardware\Voice_Recognition.h
+.\objects\timer.o: .\Hardware\Serial.h
 .\objects\timer.o: .\Hardware\HC_04.h
 .\objects\timer.o: System\MyRTC.h
+.\objects\timer.o: D:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h

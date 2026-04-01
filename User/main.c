@@ -18,7 +18,7 @@ int main(void)
 	OLED_Init(); 
 	OLED_ShowString(0, 0, "正在努力加载中…", OLED_8X16);
 	OLED_Update();
-	ESP8266_Init();
+	//ESP8266_Init();
 	MyRTC_Init();
 	AD_Init();
 	Motor_Init();
@@ -29,7 +29,7 @@ int main(void)
 	Voice_Recognition_Init();
 	HC_04_Init();
 	
-	ESP8266_GetTime();
+	//ESP8266_GetTime();
 	
 	OLED_Clear();
 	OLED_Update();

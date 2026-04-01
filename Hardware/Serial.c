@@ -5,6 +5,18 @@
 #include <string.h>
 #include "MyRTC.h"
 
+/*
+1
+ASRPRO Tx PA3 -  Tx PA9
+ASRPRO Tx PA2 -  Rx PA10
+2
+HC-04 Tx - Rx PA3
+HC-04 Rx - Tx PA2
+3
+ESP8266 Tx - Rx PB11
+ESP8266 Rx - Tx PB10
+*/
+
 uint8_t Serial_TxDataPacket[Serial_SizeofTxPacket];
 uint8_t Serial1_RxDataPacket[Serial_SizeofRxPacket];
 uint8_t Serial2_RxDataPacket[Serial_SizeofRxPacket];

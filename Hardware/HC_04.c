@@ -9,19 +9,22 @@
 #include "Count_Down.h"
 #include "Timer.h"
 #include "Voice_Recognition.h"
-#include "stdio.h"
+#include <stdio.h>
 #include <string.h> 
 
 /*
 HC-04 Tx - Rx PA3
 HC-04 Rx - Tx PA2
 0x01:开启温度调节	0x02:关闭温度调节	0x03:报温度
-0x11:升档	0x12:降档	0x13:报档位	0x14:距离过近提示
+0x11:升档	0x12:降档	0x13:报档位	0x14:距离过近提示	0x15:已经是最大档	0x16:风扇已停止
 0x2C:设置倒计时	依次说 小时：分钟：秒钟 每个块对应一个时间	0x2D:开始倒计时
 0x20 ~ 0x2B 对应0 ~ 55
 0x31:报时
+0x41:设置温度阈值
+0xFE:蓝牙已连接	0xFF:蓝牙已断开
 */
 
+uint8_t TxData2;
 uint8_t RxData2;
 extern uint8_t temp_int;
 extern uint8_t temp_dec;
@@ -86,31 +89,37 @@ void HC_04_Detect(void){
 				Temp2Gear = 0;
 				Working = 1;
 				AD_Collect_Stop();
-				if(Gear < 5){
+				if(Gear >= 5){
+					TxData2 = 0x15;
+				}else if(Gear < 5){
 					Gear++;
+					TxData2 = 0x11;
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
 				
-				Serial_SendByte(1, 0x11);
-				
+				Serial_SendByte(1, TxData2);
 				sprintf(Str, "当前档位：%d档", Gear);
 				Serial_SendString(2, Str);
-                Serial_SendByte(2, '\n');
+				Serial_SendByte(2, '\n');
 				break;
 			case 0x12:
 				Temp2Gear = 0;
 				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
+					TxData2 = 0x12;
+				}else if(Gear == 0){
+					Working = 0;
+					TxData2 = 0x16;
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
-				if(Gear == 0) Working = 0;
-				Serial_SendByte(1, 0x12);
+				
+				Serial_SendByte(1, TxData2);
 				sprintf(Str, "当前档位：%d档", Gear);
 				Serial_SendString(2, Str);
-                Serial_SendByte(2, '\n');
+				Serial_SendByte(2, '\n');
 				break;
 			case 0x13:
 				Serial_SendByte(1, 0x13); 
@@ -222,6 +231,18 @@ void HC_04_Detect(void){
 				Serial_TxDataPacket[6] = MyRTC_Time.Minute;
 				Serial_TxDataPacket[7] = MyRTC_Time.Second;
 				Serial_SendPacket(1, 8);
+				break;
+					case 0x41:
+						break
+			case 0xFE:	//蓝牙已连接
+				Serial_SendByte(1, 0xFE);
+				Serial_SendString(2, "蓝牙已开启");
+                Serial_SendByte(2, '\n');
+				break;
+			case 0xFF:	//蓝牙已连接
+				Serial_SendByte(1, 0xFF);
+				Serial_SendString(2, "蓝牙已断开");
+                Serial_SendByte(2, '\n');
 				break;
 		}
 	}
