@@ -44,7 +44,7 @@ void HC_04_Init(void){
 
 void HC_04_Detect(void){
 	if(Serial_GetRxFlag(2) == 1){
-		RxData2 =Serial_GetRxData(2);
+		RxData2 = Serial2_RxDataPacket[0];
 		//Serial_SendByte(RxData);
 		switch(RxData2){
 			case 0x01:	//开启温度调节
@@ -232,8 +232,15 @@ void HC_04_Detect(void){
 				Serial_TxDataPacket[7] = MyRTC_Time.Second;
 				Serial_SendPacket(1, 8);
 				break;
-					case 0x41:
-						break
+			case 0x41:
+				for (int i = 0; i < 5; i++) {
+					uint8_t temp_int = Serial2_RxDataPacket[1 + i * 2];   // 整数部分
+					uint8_t temp_dec = Serial2_RxDataPacket[2 + i * 2];   // 小数部分
+					
+					float temperature = temp_int + temp_dec / 10.0;
+					TempThreshold_Set(i+1, temperature);
+				}
+				break;
 			case 0xFE:	//蓝牙已连接
 				Serial_SendByte(1, 0xFE);
 				Serial_SendString(2, "蓝牙已开启");

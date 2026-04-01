@@ -31,6 +31,7 @@ uint8_t Serial2_RxData;
 uint8_t Serial3_RxData;
 uint8_t Serial1_RxFlag;
 uint8_t Serial2_RxFlag;
+uint8_t Serial2_PassFlag =0;
 uint8_t Serial3_RxFlag;
 static uint16_t Serial1_RxLen = 0;
 static uint16_t Serial2_RxLen = 0;
@@ -282,14 +283,17 @@ void Serial_ClearRxBuffer(uint8_t usartx)
 		Serial1_RxLen = 0;
 		Serial1_RxFlag = 0;          // 接收标志归零
 		memset(Serial1_RxPacket, 0, Serial_SizeofRxPacket);  // 清空
+		memset(Serial1_RxDataPacket, 0, Serial_SizeofRxPacket);  // 清空
 	}else if(usartx == 2){
 		Serial2_RxLen = 0;
 		Serial2_RxFlag = 0;          // 接收标志归零
 		memset(Serial2_RxPacket, 0, Serial_SizeofRxPacket);  // 清空
+		memset(Serial2_RxDataPacket, 0, Serial_SizeofRxPacket);  // 清空
 	}else if(usartx == 3){
 		Serial3_RxLen = 0;
 		Serial3_RxFlag = 0;          // 接收标志归零
 		memset(Serial3_RxPacket, 0, Serial_SizeofRxPacket);  // 清空
+		memset(Serial3_RxDataPacket, 0, Serial_SizeofRxPacket);  // 清空
 	}
 }
 
@@ -307,8 +311,23 @@ void USART2_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
 	{
-		Serial2_RxData = USART_ReceiveData(USART2);
-		Serial2_RxFlag = 1;
+		uint8_t RxData = USART_ReceiveData(USART2);
+
+		if(Serial2_PassFlag == 1){
+			Serial2_RxDataPacket[Serial2_RxLen] = RxData;
+			Serial2_RxLen++;
+			Serial2_PassFlag =0;
+		}else if(RxData == 0x00){
+			Serial2_PassFlag = 1;
+		}else if(RxData == 0xFF){
+			Serial2_RxLen = 0;
+		}else if(RxData == 0xFE){
+			Serial2_RxFlag = 1;
+		}else{
+			Serial2_RxDataPacket[Serial2_RxLen] = RxData;
+			Serial2_RxLen++;
+		}
+		
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
 	}
 }
