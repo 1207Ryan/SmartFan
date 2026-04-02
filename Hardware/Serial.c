@@ -31,8 +31,9 @@ uint8_t Serial2_RxData;
 uint8_t Serial3_RxData;
 uint8_t Serial1_RxFlag;
 uint8_t Serial2_RxFlag;
-uint8_t Serial2_PassFlag =0;
 uint8_t Serial3_RxFlag;
+uint8_t Serial1_PassFlag =0;
+uint8_t Serial2_PassFlag =0;
 static uint16_t Serial1_RxLen = 0;
 static uint16_t Serial2_RxLen = 0;
 static uint16_t Serial3_RxLen = 0;
@@ -264,6 +265,19 @@ void Serial_SendPacket(uint8_t usartx, uint16_t length)
 	Serial_SendByte(usartx, 0xFE);
 }
 
+void Serial_Send8Byte(uint8_t usartx, uint8_t data1, uint8_t data2, uint8_t data3,
+uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8){
+	Serial_TxDataPacket[0] = data1;
+	Serial_TxDataPacket[1] = data2;
+	Serial_TxDataPacket[2] = data3;
+	Serial_TxDataPacket[3] = data4;
+	Serial_TxDataPacket[4] = data5;
+	Serial_TxDataPacket[5] = data6;
+	Serial_TxDataPacket[6] = data7;
+	Serial_TxDataPacket[7] = data8;
+	Serial_SendArray(usartx, Serial_TxDataPacket, 8);
+}
+
 uint16_t Serial_GetRxPacketLength(uint8_t usartx)
 {
 	if(usartx == 1){
@@ -276,6 +290,12 @@ uint16_t Serial_GetRxPacketLength(uint8_t usartx)
 	return 0;
 }
 
+// 清空发送缓冲区
+void Serial_ClearTxBuffer(void){
+	memset(Serial_TxPacket, 0, Serial_SizeofTxPacket);
+	memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);
+}
+	
 // 清空接收缓冲区
 void Serial_ClearRxBuffer(uint8_t usartx)
 {
@@ -301,8 +321,23 @@ void USART1_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
 	{
-		Serial1_RxData = USART_ReceiveData(USART1);
-		Serial1_RxFlag = 1;
+		uint8_t RxData = USART_ReceiveData(USART1);
+
+		if(Serial1_PassFlag == 1){
+			Serial1_RxDataPacket[Serial1_RxLen] = RxData;
+			Serial1_RxLen++;
+			Serial1_PassFlag =0;
+		}else if(RxData == 0x00){
+			Serial1_PassFlag = 1;
+		}else if(RxData == 0xFF){
+			Serial1_RxLen = 0;
+		}else if(RxData == 0xFE){
+			Serial1_RxFlag = 1;
+		}else{
+			Serial1_RxDataPacket[Serial1_RxLen] = RxData;
+			Serial1_RxLen++;
+		}
+		
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 }

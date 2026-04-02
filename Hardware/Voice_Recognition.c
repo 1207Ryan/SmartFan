@@ -39,9 +39,8 @@ void Voice_Recognition_Init(void){
 }
 
 void Voice_Recognition(void){
-	if(Serial_GetRxFlag(1) == 1)
-	{
-		RxData =Serial_GetRxData(1);
+	if(Serial_GetRxFlag(1) == 1){
+		RxData = Serial1_RxDataPacket[0];
 		//Serial_SendByte(RxData);
 		switch(RxData){
 			case 0x01:	//开启温度调节
@@ -299,7 +298,7 @@ void Voice_Recognition(void){
 			case 0x31:
 				MyRTC_ReadTime();
 				
-				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				Serial_ClearTxBuffer(); // 清空发送缓冲区
 				
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
 				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
@@ -317,7 +316,7 @@ void Voice_Recognition(void){
 				ESP8266_GetTime();
 				MyRTC_ReadTime();
 				
-				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				Serial_ClearTxBuffer(); // 清空发送缓冲区
 				
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
 				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位

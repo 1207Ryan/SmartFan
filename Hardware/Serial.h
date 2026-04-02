@@ -46,6 +46,9 @@ uint8_t Serial_GetRxFlag(uint8_t usartx);
 uint8_t Serial_GetRxData(uint8_t usartx);
 uint16_t Serial_GetRxPacketLength(uint8_t usartx);
 void Serial_SendPacket(uint8_t usartx, uint16_t);
+void Serial_Send8Byte(uint8_t usartx, uint8_t data1, uint8_t data2, uint8_t data3,
+uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8);
+void Serial_ClearTxBuffer(void);
 void Serial_ClearRxBuffer(uint8_t usartx);
 
 #endif

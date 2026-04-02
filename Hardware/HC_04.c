@@ -21,7 +21,7 @@ HC-04 Rx - Tx PA2
 0x20 ~ 0x2B 对应0 ~ 55
 0x31:报时
 0x41:设置温度阈值
-0xFE:蓝牙已连接	0xFF:蓝牙已断开
+0xEE:蓝牙已连接	0xEF:蓝牙已断开
 */
 
 uint8_t TxData2;
@@ -220,7 +220,7 @@ void HC_04_Detect(void){
                 Serial_SendByte(2, '\n');
 				
 				Serial_SendByte(1, 0x31);
-				memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);// 清空发送缓冲区
+				Serial_ClearTxBuffer(); // 清空发送缓冲区
 				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
 				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
 				Serial_TxDataPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
@@ -241,12 +241,12 @@ void HC_04_Detect(void){
 					TempThreshold_Set(i+1, temperature);
 				}
 				break;
-			case 0xFE:	//蓝牙已连接
+			case 0xEE:	//蓝牙已连接
 				Serial_SendByte(1, 0xFE);
 				Serial_SendString(2, "蓝牙已开启");
                 Serial_SendByte(2, '\n');
 				break;
-			case 0xFF:	//蓝牙已连接
+			case 0xEF:	//蓝牙已断开
 				Serial_SendByte(1, 0xFF);
 				Serial_SendString(2, "蓝牙已断开");
                 Serial_SendByte(2, '\n');

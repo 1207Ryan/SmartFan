@@ -35,7 +35,7 @@ I (D:\Keil5\ARM\ARMCC\include\math.h)(0x588B8344)
 I (D:\Keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\Keil5\ARM\ARMCC\include\stdarg.h)(0x588B8344)
 F (.\Hardware\OLED.h)(0x69C89D22)()
-F (.\Hardware\OLED_Data.c)(0x69CC7906)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\oled_data.o --omf_browse .\objects\oled_data.crf --depend .\objects\oled_data.d)
+F (.\Hardware\OLED_Data.c)(0x69CE894F)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\oled_data.o --omf_browse .\objects\oled_data.crf --depend .\objects\oled_data.d)
 I (Hardware\OLED_Data.h)(0x68C6616F)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
 F (.\Hardware\OLED_Data.h)(0x68C6616F)()
@@ -132,7 +132,7 @@ I (.\Library\misc.h)(0x4D783BB4)
 I (Hardware\Key.h)(0x69BB5476)
 I (.\System\Delay.h)(0x6130920D)
 F (.\Hardware\Key.h)(0x69BB5476)()
-F (.\Hardware\Menu.c)(0x69CC7BCB)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\menu.o --omf_browse .\objects\menu.crf --depend .\objects\menu.d)
+F (.\Hardware\Menu.c)(0x69CE894E)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\menu.o --omf_browse .\objects\menu.crf --depend .\objects\menu.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -165,16 +165,16 @@ I (.\System\Delay.h)(0x6130920D)
 I (Hardware\OLED.h)(0x69C89D22)
 I (Hardware\OLED_Data.h)(0x68C6616F)
 I (Hardware\Key.h)(0x69BB5476)
-I (Hardware\Menu.h)(0x69CC7973)
+I (Hardware\Menu.h)(0x69CE7D6A)
 I (Hardware\Motor.h)(0x69BFCF46)
 I (.\System\MyRTC.h)(0x69C3A214)
 I (Hardware\AD.h)(0x69CC8005)
 I (Hardware\HC_SR04.h)(0x69C0EF9A)
 I (.\System\Count_Down.h)(0x69C39FF1)
 I (.\System\Timer.h)(0x69C397FD)
-I (Hardware\Serial.h)(0x69C8D47F)
+I (Hardware\Serial.h)(0x69CE78A9)
 I (Hardware\ESP8266.h)(0x69C88D02)
-F (.\Hardware\Menu.h)(0x69CC7973)()
+F (.\Hardware\Menu.h)(0x69CE7D6A)()
 F (.\Hardware\AD.c)(0x69CC7FFE)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\ad.o --omf_browse .\objects\ad.crf --depend .\objects\ad.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
@@ -240,7 +240,7 @@ I (.\Library\misc.h)(0x4D783BB4)
 I (Hardware\HC_SR04.h)(0x69C0EF9A)
 I (.\System\Delay.h)(0x6130920D)
 F (.\Hardware\HC_SR04.h)(0x69C0EF9A)()
-F (.\Hardware\Serial.c)(0x69CC9ACB)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\serial.o --omf_browse .\objects\serial.crf --depend .\objects\serial.d)
+F (.\Hardware\Serial.c)(0x69CE8182)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\serial.o --omf_browse .\objects\serial.crf --depend .\objects\serial.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -270,12 +270,12 @@ I (.\Library\stm32f10x_usart.h)(0x4D783BB4)
 I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
 I (D:\Keil5\ARM\ARMCC\include\stdarg.h)(0x588B8344)
-I (Hardware\Serial.h)(0x69C8D47F)
+I (Hardware\Serial.h)(0x69CE78A9)
 I (D:\Keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (D:\Keil5\ARM\ARMCC\include\string.h)(0x588B8344)
 I (.\System\MyRTC.h)(0x69C3A214)
-F (.\Hardware\Serial.h)(0x69C8D47F)()
-F (.\Hardware\Voice_Recognition.c)(0x69C8D4EA)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\voice_recognition.o --omf_browse .\objects\voice_recognition.crf --depend .\objects\voice_recognition.d)
+F (.\Hardware\Serial.h)(0x69CE78A9)()
+F (.\Hardware\Voice_Recognition.c)(0x69CE595D)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\voice_recognition.o --omf_browse .\objects\voice_recognition.crf --depend .\objects\voice_recognition.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -304,9 +304,9 @@ I (.\Library\stm32f10x_tim.h)(0x4D783BB4)
 I (.\Library\stm32f10x_usart.h)(0x4D783BB4)
 I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
-I (Hardware\Serial.h)(0x69C8D47F)
+I (Hardware\Serial.h)(0x69CE78A9)
 I (.\System\Delay.h)(0x6130920D)
-I (Hardware\Menu.h)(0x69CC7973)
+I (Hardware\Menu.h)(0x69CE7D6A)
 I (Hardware\Motor.h)(0x69BFCF46)
 I (.\System\MyRTC.h)(0x69C3A214)
 I (Hardware\AD.h)(0x69CC8005)
@@ -316,7 +316,7 @@ I (.\System\Timer.h)(0x69C397FD)
 I (D:\Keil5\ARM\ARMCC\include\string.h)(0x588B8344)
 I (Hardware\ESP8266.h)(0x69C88D02)
 F (.\Hardware\Voice_Recognition.h)(0x69C15BE0)()
-F (.\Hardware\HC_04.c)(0x69CCA130)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\hc_04.o --omf_browse .\objects\hc_04.crf --depend .\objects\hc_04.d)
+F (.\Hardware\HC_04.c)(0x69CE79B6)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\hc_04.o --omf_browse .\objects\hc_04.crf --depend .\objects\hc_04.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -345,9 +345,9 @@ I (.\Library\stm32f10x_tim.h)(0x4D783BB4)
 I (.\Library\stm32f10x_usart.h)(0x4D783BB4)
 I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
-I (Hardware\Serial.h)(0x69C8D47F)
+I (Hardware\Serial.h)(0x69CE78A9)
 I (.\System\Delay.h)(0x6130920D)
-I (Hardware\Menu.h)(0x69CC7973)
+I (Hardware\Menu.h)(0x69CE7D6A)
 I (Hardware\Motor.h)(0x69BFCF46)
 I (.\System\MyRTC.h)(0x69C3A214)
 I (Hardware\AD.h)(0x69CC8005)
@@ -387,7 +387,7 @@ I (.\Library\stm32f10x_tim.h)(0x4D783BB4)
 I (.\Library\stm32f10x_usart.h)(0x4D783BB4)
 I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
-I (Hardware\Serial.h)(0x69C8D47F)
+I (Hardware\Serial.h)(0x69CE78A9)
 I (Hardware\ESP8266.h)(0x69C88D02)
 I (.\System\Delay.h)(0x6130920D)
 I (.\System\MyRTC.h)(0x69C3A214)
@@ -427,7 +427,7 @@ I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
 I (.\Hardware\Motor.h)(0x69BFCF46)
 I (.\Hardware\Voice_Recognition.h)(0x69C15BE0)
-I (.\Hardware\Serial.h)(0x69C8D47F)
+I (.\Hardware\Serial.h)(0x69CE78A9)
 I (.\Hardware\HC_04.h)(0x69C7397C)
 F (.\System\Count_Down.h)(0x69C39FF1)()
 F (.\System\Delay.c)(0x6130920E)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\delay.o --omf_browse .\objects\delay.crf --depend .\objects\delay.d)
@@ -492,7 +492,7 @@ I (.\Library\misc.h)(0x4D783BB4)
 I (System\MyRTC.h)(0x69C3A214)
 I (D:\Keil5\ARM\ARMCC\include\time.h)(0x588B8344)
 F (.\System\MyRTC.h)(0x69C3A214)()
-F (.\System\Timer.c)(0x69CBDD98)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\timer.o --omf_browse .\objects\timer.crf --depend .\objects\timer.d)
+F (.\System\Timer.c)(0x69CE5D55)(--c99 -c --cpu Cortex-M3 -g -O0 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware --no-multibyte-chars-I.\RTE\_Target_1-ID:\Keil5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-ID:\Keil5\ARM\CMSIS\Include-D__UVISION_VERSION="524" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\timer.o --omf_browse .\objects\timer.crf --depend .\objects\timer.d)
 I (.\Start\stm32f10x.h)(0x4D783CB4)
 I (.\Start\core_cm3.h)(0x4D523B58)
 I (D:\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -523,12 +523,12 @@ I (.\Library\stm32f10x_wwdg.h)(0x4D783BB4)
 I (.\Library\misc.h)(0x4D783BB4)
 I (System\Delay.h)(0x6130920D)
 I (.\Hardware\Key.h)(0x69BB5476)
-I (.\Hardware\Menu.h)(0x69CC7973)
+I (.\Hardware\Menu.h)(0x69CE7D6A)
 I (.\Hardware\AD.h)(0x69CC8005)
 I (.\Hardware\HC_SR04.h)(0x69C0EF9A)
 I (.\Hardware\Motor.h)(0x69BFCF46)
 I (.\Hardware\Voice_Recognition.h)(0x69C15BE0)
-I (.\Hardware\Serial.h)(0x69C8D47F)
+I (.\Hardware\Serial.h)(0x69CE78A9)
 I (.\Hardware\HC_04.h)(0x69C7397C)
 I (System\MyRTC.h)(0x69C3A214)
 I (D:\Keil5\ARM\ARMCC\include\stdio.h)(0x588B8344)
@@ -1316,7 +1316,7 @@ I (.\Hardware\OLED.h)(0x69C89D22)
 I (.\Hardware\OLED_Data.h)(0x68C6616F)
 I (.\Hardware\Motor.h)(0x69BFCF46)
 I (.\Hardware\Key.h)(0x69BB5476)
-I (.\Hardware\Menu.h)(0x69CC7973)
+I (.\Hardware\Menu.h)(0x69CE7D6A)
 I (.\Hardware\AD.h)(0x69CC8005)
 I (.\System\Timer.h)(0x69C397FD)
 I (.\System\MyRTC.h)(0x69C3A214)

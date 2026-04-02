@@ -109,12 +109,6 @@ void TIM3_IRQHandler(void){
 			temp_int = (uint8_t)Temp; // 25.6 → 25
 			// 2. 提取小数位（放大10倍后取余，保留1位）
 			temp_dec = (uint8_t)((Temp - temp_int) * 10); // 25.6-25=0.6 → 0.6×10=6
-			
-			Serial_SendByte(1, 0x03);
-			Delay_ms(1);  
-			Serial_SendByte(1, temp_int);  // 第一次发送：整数位（25 → 0x19）
-			Delay_ms(1);                // 短暂延时，避免接收端粘包（可选）
-			Serial_SendByte(1, temp_dec);  // 第二次发送：小数位（6 → 0x06）
 		
 			// 合成一条完整字符串：当前温度：25.6℃
 			sprintf(Str, "当前温度：%d.%d℃", temp_int, temp_dec);
