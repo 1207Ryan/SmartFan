@@ -32,6 +32,7 @@ volatile float Temp;
 volatile uint8_t Temp2Gear = 0;
 volatile uint8_t VoiceVolume = 1;
 volatile uint8_t MusicVolume = 10;
+volatile uint8_t Music_IsOn = 0;
 extern volatile uint8_t IsSafe;
 extern uint32_t cnt;
 extern uint8_t Count_Started;
@@ -1157,24 +1158,24 @@ void Menu3_SetTempThreshold(uint8_t TempThresHold_x){
   */
 void Menu2_Music(){
 	uint8_t Menu2_Select = 0;
-//	uint8_t Menu2_IsOn;
-//	uint8_t time_out = 0;
+
+	
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
 			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
 				OLED_ShowString(0, 0,  "<-              ", OLED_8X16);
 				OLED_ShowString(0, 16, "播放             ", OLED_8X16);
-				OLED_ShowString(0, 32, "暂停             ", OLED_8X16);
-				OLED_ShowString(0, 48, "下一首           	", OLED_8X16);
+				OLED_ShowString(0, 32, "下一首             ", OLED_8X16);
+				OLED_ShowString(0, 48, "上一首           	", OLED_8X16);
 			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 8){
 				OLED_ShowString(0, 0,  "<-              ", OLED_8X16);
-				OLED_ShowString(0, 16, "上一首          ", OLED_8X16);
-				OLED_ShowString(0, 32, "设置音量       ", OLED_8X16);
-				OLED_ShowString(0, 48, "设置播放顺序       ", OLED_8X16);
+				OLED_ShowString(0, 16, "设置音量          ", OLED_8X16);
+				OLED_ShowString(0, 32, "设置播放顺序      ", OLED_8X16);
+				OLED_ShowString(0, 48, "设置播放歌曲       ", OLED_8X16);
 			}else if(CurrSelect2 >= 9 && CurrSelect2 <= 10){
 				OLED_ShowString(0, 0,  "<-              ", OLED_8X16);
-				OLED_ShowString(0, 16, "设置播放歌曲       ", OLED_8X16);
+				OLED_ShowString(0, 16, "       ", OLED_8X16);
 				OLED_ShowString(0, 32, "                ", OLED_8X16);
 				OLED_ShowString(0, 48, "                ", OLED_8X16);
 			}
@@ -1182,42 +1183,32 @@ void Menu2_Music(){
 			OLED_Update();
 			CurrState = 1;
 		}
-//		else{
-//			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-//			
-//			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
-//				Serial_ClearTxBuffer();
-//				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x42, 0x00, 0x00, 0x00, 0xEF);
-//				while(Serial_GetRxFlag(1) == 0 && time_out < 10){
-//					Delay_ms(100);
-//					time_out++;
-//				}
-//				time_out = 0;
-//				Menu2_IsOn = Serial1_RxDataPacket[6];
-//				if(Menu2_IsOn == 0x01){//播放状态
-//					OLED_ClearArea(0, 16, 64, 16);
-//					OLED_ShowString(0, 16, "暂停             ", OLED_8X16);
-//					OLED_UpdateArea(0, 16, 64, 16);
-//				}else{//停止状态
-//					OLED_ClearArea(0, 16, 64, 16);
-//					OLED_ShowString(0, 16, "播放             ", OLED_8X16);
-//					OLED_UpdateArea(0, 16, 64, 16);
-//				}
-//			}
-//		}
+		else{
+			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+				OLED_ClearArea(0, 16, 32, 16);
+				if(Music_IsOn == 1){//正在播放
+					OLED_ShowString(0, 16, "暂停             ", OLED_8X16);
+				}else{//正在暂停
+					OLED_ShowString(0, 16, "播放             ", OLED_8X16);
+				}
+				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(0, 16, 32, 16);
+			}
+		}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
-				CurrSelect2 = 10;
+				CurrSelect2 = 8;
 			}
 		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			OLED_ReverseArea(0, ((CurrSelect2-1)*16)%64, 128, 16);
 			CurrSelect2++;
-			if(CurrSelect2 > 10){
+			if(CurrSelect2 > 8){
 				CurrSelect2 = 1;
 			}
 		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
@@ -1235,44 +1226,40 @@ void Menu2_Music(){
 				return;
 			case 2:	
 				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+				if(Music_IsOn == 1){//正在播放
+					Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
+					Music_IsOn = 0;
+				}else{//未在播放
+					Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+					Music_IsOn = 1;
+				}
 				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
-			case 3:	
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
-				Serial_SendPacket(1, 8);
-				Menu2_Select = 0;
-				break;
-			case 4:	//下一首
+			case 3:	//下一首
 				Serial_ClearTxBuffer();
 				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xEF);//下一首
+				Serial_SendPacket(1, 8);
+				Menu2_Select = 0;
+				break;
+			case 4:	//上一首
+				Serial_ClearTxBuffer();
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);//上一首
 				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 5:
 				Menu2_Select = 0;
 				CurrSelect2 = 1;
-			case 6:	//上一首
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);//上一首
-				Serial_SendPacket(1, 8);
-				Menu2_Select = 0;
-				break;
-			case 7:
+			case 6:
 				Menu2_Select = 0;
 				Menu3_SetMusicVolume();
 				break;
-			case 8:
+			case 7:
 				Menu2_Select = 0;
 				Menu3_SetMusicOrder();
 				break;
-			case 9:
-				Menu2_Select = 0;
-				CurrSelect2 = 1;
-				return;
-			case 10:
+			case 8:
 				Menu2_Select = 0;
 				Menu3_SetMusic();
 				break;
