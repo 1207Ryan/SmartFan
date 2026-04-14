@@ -1,7 +1,7 @@
 #ifndef __MENU_H
 #define __MENU_H
 
-#define TotalSelect 8
+#define TotalSelect 9
 
 extern uint8_t CurrSelect1;
 extern uint8_t CurrSelect2;
@@ -23,6 +23,7 @@ void Menu2_Clock(void);
 void Menu2_Weather(void);
 void Menu2_SetTempThreshold(void);
 void Menu2_Music(void);
+void Menu2_SetVoiceVolume(void);
 void Menu2_Debug(void);
 
 void Menu3_CountDown(void);

@@ -41,3 +41,4 @@
 .\objects\menu.o: .\System\Timer.h
 .\objects\menu.o: Hardware\Serial.h
 .\objects\menu.o: Hardware\ESP8266.h
+.\objects\menu.o: Hardware\Voice_Recognition.h

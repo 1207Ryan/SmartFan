@@ -11,6 +11,7 @@
 #include "Timer.h"
 #include "Serial.h"
 #include "ESP8266.h"
+#include "Voice_Recognition.h"
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -29,6 +30,8 @@ volatile uint8_t Gear;
 volatile uint8_t Last_Gear;
 volatile float Temp;
 volatile uint8_t Temp2Gear = 0;
+volatile uint8_t VoiceVolume = 1;
+volatile uint8_t MusicVolume = 10;
 extern volatile uint8_t IsSafe;
 extern uint32_t cnt;
 extern uint8_t Count_Started;
@@ -49,7 +52,12 @@ uint8_t Menu1(void){
 				OLED_ShowString(0, 0,  "天气显示        	  ", OLED_8X16);
 				OLED_ShowString(0, 16, "调整温度阈值     	  ", OLED_8X16);
 				OLED_ShowString(0, 32, "音乐               ", OLED_8X16);
-				OLED_ShowString(0, 48, "调试               ", OLED_8X16);
+				OLED_ShowString(0, 48, "调整语音音量         ", OLED_8X16);
+			}else if(CurrSelect1 >= 9 && CurrSelect1 <= 9){
+				OLED_ShowString(0, 0,  "调试                   ", OLED_8X16);
+				OLED_ShowString(0, 16, "                      ", OLED_8X16);
+				OLED_ShowString(0, 32, "                      ", OLED_8X16);
+				OLED_ShowString(0, 48, "                      ", OLED_8X16);
 			}
 
 			OLED_ReverseArea(0, ((CurrSelect1-1)*16)%64, 128, 16);
@@ -109,6 +117,10 @@ uint8_t Menu1(void){
 				Menu2_Music();
 				break;
 			case 8:
+				Menu1_Select = 0;
+				Menu2_SetVoiceVolume();
+				break;
+			case 9:
 				Menu1_Select = 0;
 				Menu2_Debug();
 				break;
@@ -188,7 +200,8 @@ void Menu2_Temp(){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
-				Serial_SendByte(1, 0x01);
+				Fan_On();
+				//Serial_SendByte(1, 0x01);
 				Menu2_Select = 0;
 				break;
 			case 3:		//停止风扇
@@ -199,7 +212,8 @@ void Menu2_Temp(){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Serial_SendByte(1, 0x02);
+				Fan_Off();
+				//Serial_SendByte(1, 0x02);
 				Menu2_Select = 0;
 				break;
 		}
@@ -278,10 +292,12 @@ void Menu2_Fan(void){
 				AD_Collect_Stop();
 				if(Gear < 5){
 					Gear++;
+					Fan_Gear_Up();
+				}else if(Gear >= 5){
+					Fan_Gear_Max();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
-				Serial_SendByte(1, 0x11);
 				Menu2_Select = 0;
 				break;
 			case 3:		//降档
@@ -289,11 +305,13 @@ void Menu2_Fan(void){
 				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
+					Fan_Gear_Down();
+				}else if(Gear == 0){
+					Working = 0;
+					Fan_Off();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
-				if(Gear == 0) Working = 0;
-				Serial_SendByte(1, 0x12);
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
@@ -303,6 +321,7 @@ void Menu2_Fan(void){
 				Last_Gear = 0;
 				Motor_Stop();
 				Working = 0;
+				Fan_Off();
 				Menu2_Select = 0;
 				break;
 		}
@@ -324,7 +343,7 @@ void Menu2_CountDown(void){
 			if(CurrSelect2>=1 && CurrSelect2<=3){
 				OLED_ShowString(0, 0,  "<-            档", OLED_8X16);
 				OLED_ShowString(0, 16, "设置倒计时         ", OLED_8X16);
-				OLED_ShowString(0, 32, "    倒计时          ", OLED_8X16);
+				OLED_ShowString(0, 32, "XXXX倒计时          ", OLED_8X16);
 				OLED_ShowString(0, 48, "倒计时:            ", OLED_8X16);
 			}
 			OLED_ShowChar(72, 48, 'h', OLED_8X16);
@@ -1117,6 +1136,7 @@ void Menu3_SetTempThreshold(uint8_t TempThresHold_x){
 			case 1:
 				Menu3_Select = 0;
 				CurrSelect3 = 1;
+				SetTempThreshold();
 				return;
 			case 2:
 				Menu3_Select = 0;
@@ -1215,17 +1235,20 @@ void Menu2_Music(){
 				return;
 			case 2:	
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 3:	
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
+				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 4:	//下一首
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xEF);
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xEF);//下一首
+				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 5:
@@ -1233,7 +1256,8 @@ void Menu2_Music(){
 				CurrSelect2 = 1;
 			case 6:	//上一首
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);//上一首
+				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 7:
@@ -1267,14 +1291,20 @@ void Menu3_SetMusicVolume(void){
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
-			OLED_ShowString(0, 0,  "<-               ", OLED_8X16);
-			OLED_ShowString(0, 16, "设置最大音量        ", OLED_8X16);
-			OLED_ShowString(0, 32, "设置中等音量        ", OLED_8X16);
-			OLED_ShowString(0, 48, "设置最小音量        ", OLED_8X16);
+			OLED_ShowString(0, 0,  "<-  当前音量:      ", OLED_8X16);
+			OLED_ShowString(0, 16, "音量+1            ", OLED_8X16);
+			OLED_ShowString(0, 32, "音量-1            ", OLED_8X16);
+			OLED_ShowString(0, 48, "                 ", OLED_8X16);
 			
 			OLED_ReverseArea(0, (CurrSelect3 - 1)*16, 128, 16);
 			OLED_Update();
 			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, (CurrSelect3 - 1)*16, 128, 16);
+			OLED_ClearArea(112, 0, 16, 16);
+			OLED_ShowNum(112, 0, MusicVolume, 2, OLED_8X16);
+			OLED_ReverseArea(0, (CurrSelect3 - 1)*16, 128, 16);
+			OLED_UpdateArea(112, 0, 16, 16);
 		}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
@@ -1289,7 +1319,7 @@ void Menu3_SetMusicVolume(void){
 			if(CurrSelect3 > 4){
 				CurrSelect3 = 1;
 			}
-		}else if(Key_Check(KEY_3, KEY_SINGLE)){//确认
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
 			CurrState = 0;
 			OLED_Clear();
 			OLED_Update();
@@ -1303,18 +1333,21 @@ void Menu3_SetMusicVolume(void){
 				return;
 			case 2:
 				Menu3_Select = 0;
+				if(MusicVolume < 30){
+					MusicVolume++;
+				}
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x1E, 0xEF);//30级音量
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, MusicVolume, 0xEF);
+				Serial_SendPacket(1, 8);
 				break;
 			case 3:
 				Menu3_Select = 0;
+				if(MusicVolume > 1){
+					MusicVolume--;
+				}
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x14, 0xEF);//20级音量
-				break;
-			case 4:
-				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, 0x0A, 0xEF);//10级音量
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, MusicVolume, 0xEF);
+				Serial_SendPacket(1, 8);
 				break;
 		}
 	}
@@ -1368,17 +1401,20 @@ void Menu3_SetMusicOrder(void){
 			case 2:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x19, 0x00, 0x00, 0x00, 0xEF);//单曲循环开启
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x19, 0x00, 0x00, 0x00, 0xEF);//单曲循环开启
+				Serial_SendPacket(1, 8);
 				break;
 			case 3:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x11, 0x00, 0x00, 0x01, 0xEF);//顺序播放
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x11, 0x00, 0x00, 0x01, 0xEF);//顺序播放
+				Serial_SendPacket(1, 8);
 				break;
 			case 4:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x18, 0x00, 0x00, 0x00, 0xEF);//随机播放
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x18, 0x00, 0x00, 0x00, 0xEF);//随机播放
+				Serial_SendPacket(1, 8);
 				break;
 		}
 	}
@@ -1432,17 +1468,94 @@ void Menu3_SetMusic(void){
 			case 2:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x01, 0xEF);//周杰伦
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x01, 0xEF);//周杰伦
+				Serial_SendPacket(1, 8);
 				break;
 			case 3:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x02, 0xEF);//林俊杰
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x02, 0xEF);//林俊杰
+				Serial_SendPacket(1, 8);
 				break;
 			case 4:
 				Menu3_Select = 0;
 				Serial_ClearTxBuffer();
-				Serial_Send8Byte(1, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x03, 0xEF);//王力宏
+				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x03, 0xEF);//王力宏
+				Serial_SendPacket(1, 8);
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 设置语音音量二级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu2_SetVoiceVolume(void){
+	uint8_t Menu2_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			
+			OLED_ShowString(0, 0,  "<-   当前音量:     ", OLED_8X16);
+			OLED_ShowString(0, 16, "音量+1            ", OLED_8X16);
+			OLED_ShowString(0, 32, "音量-1            ", OLED_8X16);
+			OLED_ShowString(0, 48, "                 ", OLED_8X16);
+			
+			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
+			OLED_ClearArea(120, 0, 8, 16);
+			OLED_ShowNum(120, 0, VoiceVolume, 1, OLED_8X16);
+			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
+			OLED_UpdateArea(120, 0, 8, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect2--;
+			if(CurrSelect2 <= 0){
+				CurrSelect2 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect2++;
+			if(CurrSelect2 > 3){
+				CurrSelect2 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu2_Select = CurrSelect2;
+		}
+		
+		switch(Menu2_Select){
+			case 1:
+				Menu2_Select = 0;
+				CurrSelect2 = 1;
+				return;
+			case 2://音量+1
+				Menu2_Select = 0;
+				if(VoiceVolume < 7){
+					VoiceVolume++;
+					Volume_Up();
+				}else{
+					Volume_Max();
+				}
+				break;
+			case 3://音量-1
+				Menu2_Select = 0;
+				if(VoiceVolume > 1){
+					VoiceVolume--;
+					Volume_Down();
+				}else{
+					Volume_Min();
+				}
 				break;
 		}
 	}
@@ -1519,6 +1632,7 @@ void Menu2_Debug(void){
 		switch(Menu2_Select){
 			case 1:
 				Menu2_Select = 0;
+				CurrSelect2 = 1;
 				return;
 		}
 	}

@@ -195,8 +195,7 @@ static float GetSingleDistance(void)
     }
 
     // 3. 过滤无效值+超近距离校准
-    if (g_Echo_Time >= MIN_ECHO_TIME && g_Echo_Time <= MAX_ECHO_TIME && g_Echo_Flag)
-    {
+    if (g_Echo_Time >= MIN_ECHO_TIME && g_Echo_Time <= MAX_ECHO_TIME && g_Echo_Flag){
         distance = g_Echo_Time * SOUND_SPEED_COEFF;
         // 超近距离校准（1~2cm减0.2cm，2~5cm减0.1cm）
         if(distance < 2.0f)
@@ -207,10 +206,12 @@ static float GetSingleDistance(void)
         {
             distance -= 0.1f;
         }
-    }
-    else
-    {
+    }else if (g_Echo_Time < MIN_ECHO_TIME){
         distance = 0.0f;
+    }else if (g_Echo_Time > MAX_ECHO_TIME){
+        distance = MAX_ECHO_TIME * SOUND_SPEED_COEFF;
+    }else{
+        distance = MAX_ECHO_TIME * SOUND_SPEED_COEFF;
     }
 
     return distance;

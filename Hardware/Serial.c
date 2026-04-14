@@ -156,8 +156,12 @@ void Serial_Init(uint8_t usartx)
 void Serial_SendByte(uint8_t usartx, uint8_t Byte)//发送字节数据
 {
 	if(usartx == 1){
+		if(Byte == 0xFF || Byte == 0xFE || Byte == 0x00){
+			USART_SendData(USART1, 0x00);
+			while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+		}
 		USART_SendData(USART1, Byte);
-		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);	
+		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
 		//判断TXE是否置1，即数据是否从发送数据寄存器转移到发送移位寄存器
 		//标志寄存器会自动清零
 	}else if(usartx == 2){
@@ -171,7 +175,7 @@ void Serial_SendByte(uint8_t usartx, uint8_t Byte)//发送字节数据
 
 void Serial_SendArray(uint8_t usartx, uint8_t *Array, uint16_t length)
 {
-	for(uint8_t i=0; i<length; i++){
+	for(uint8_t i = 0; i < length; i++){
 		Serial_SendByte(usartx, Array[i]);
 	}
 }
@@ -258,24 +262,59 @@ uint8_t Serial_GetRxData(uint8_t usartx)
 	return 0;
 }
 
-void Serial_SendPacket(uint8_t usartx, uint16_t length)
-{
-	Serial_SendByte(usartx, 0xFF);
-	Serial_SendArray(usartx, Serial_TxDataPacket, length);
-	Serial_SendByte(usartx, 0xFE);
+void Serial_SetTxDataPacket(uint8_t len, ...) {// 可变参数版本：支持 1~8 字节自动填充
+    va_list args;
+    va_start(args, len);  // 从 len 后面开始取参数
+
+    // 清空发送缓冲区
+    memset(Serial_TxDataPacket, 0, Serial_SizeofTxPacket);
+
+    // 最多只取 Serial_SizeofTxPacket 个字节
+    if (len > Serial_SizeofTxPacket) len = Serial_SizeofTxPacket;
+
+    // 逐个读取参数放进数组
+    for (int i = 0; i < len; i++) {
+        Serial_TxDataPacket[i] = (uint8_t)va_arg(args, int);
+    }
+
+    va_end(args);
 }
 
-void Serial_Send8Byte(uint8_t usartx, uint8_t data1, uint8_t data2, uint8_t data3,
-uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8){
-	Serial_TxDataPacket[0] = data1;
-	Serial_TxDataPacket[1] = data2;
-	Serial_TxDataPacket[2] = data3;
-	Serial_TxDataPacket[3] = data4;
-	Serial_TxDataPacket[4] = data5;
-	Serial_TxDataPacket[5] = data6;
-	Serial_TxDataPacket[6] = data7;
-	Serial_TxDataPacket[7] = data8;
-	Serial_SendArray(usartx, Serial_TxDataPacket, 8);
+void Serial_Start(uint8_t usartx){
+	if(usartx == 1){
+		USART_SendData(USART1, 0xFF);
+		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);	
+		//判断TXE是否置1，即数据是否从发送数据寄存器转移到发送移位寄存器
+		//标志寄存器会自动清零
+	}else if(usartx == 2){
+		USART_SendData(USART2, 0xFF);
+		while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);	
+	}else if(usartx == 3){
+		USART_SendData(USART3, 0xFF);
+		while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);	
+	}
+}
+
+void Serial_Stop(uint8_t usartx){
+	if(usartx == 1){
+		USART_SendData(USART1, 0xFE);
+		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);	
+		//判断TXE是否置1，即数据是否从发送数据寄存器转移到发送移位寄存器
+		//标志寄存器会自动清零
+	}else if(usartx == 2){
+		USART_SendData(USART2, 0xFE);
+		while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);	
+	}else if(usartx == 3){
+		USART_SendData(USART3, 0xFE);
+		while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);	
+	}
+}
+
+void Serial_SendPacket(uint8_t usartx, uint16_t length)
+{
+	Serial_Start(usartx);
+	Serial_SendArray(usartx, Serial_TxDataPacket, length);
+	Serial_Stop(usartx);
 }
 
 uint16_t Serial_GetRxPacketLength(uint8_t usartx)

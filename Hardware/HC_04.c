@@ -52,7 +52,8 @@ void HC_04_Detect(void){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
-				Serial_SendByte(1, 0x01);
+				Fan_On();
+				//Serial_SendByte(1, 0x01);
 				Serial_SendString(2, "风扇已开启");
                 Serial_SendByte(2, '\n');
 				break;
@@ -64,7 +65,8 @@ void HC_04_Detect(void){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Serial_SendByte(1, 0x02);
+				Fan_Off();
+				//Serial_SendByte(1, 0x02);
 				Serial_SendString(2, "风扇已关闭");
                 Serial_SendByte(2, '\n');
 				break;
@@ -74,11 +76,8 @@ void HC_04_Detect(void){
                 // 2. 提取小数位（放大10倍后取余，保留1位）
                 temp_dec = (uint8_t)((Temp - temp_int) * 10); // 25.6-25=0.6 → 0.6×10=6
 				
-				Serial_SendByte(1, 0x03);
-				Delay_ms(1);  
-				Serial_SendByte(1, temp_int);  // 第一次发送：整数位（25 → 0x19）
-                Delay_ms(1);                // 短暂延时，避免接收端粘包（可选）
-                Serial_SendByte(1, temp_dec);  // 第二次发送：小数位（6 → 0x06）
+				Serial_SetTxDataPacket(3, 0x03, temp_int, temp_dec); // 第一位：整数位（25 → 0x19）；第二位：小数位（6 → 0x06）
+				Serial_SendPacket(1, 3); 
 			
 				// 合成一条完整字符串：当前温度：25.6℃
 				sprintf(Str, "当前温度：%d.%d℃", temp_int, temp_dec);
@@ -90,15 +89,16 @@ void HC_04_Detect(void){
 				Working = 1;
 				AD_Collect_Stop();
 				if(Gear >= 5){
-					TxData2 = 0x15;
+					Fan_Gear_Max();	//已经是最大档位
 				}else if(Gear < 5){
 					Gear++;
-					TxData2 = 0x11;
+					Fan_Gear_Up();	//档位已上升
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
 				
-				Serial_SendByte(1, TxData2);
+				Serial_SetTxDataPacket(1, TxData2);
+				Serial_SendPacket(1, 1); 
 				sprintf(Str, "当前档位：%d档", Gear);
 				Serial_SendString(2, Str);
 				Serial_SendByte(2, '\n');
@@ -108,22 +108,21 @@ void HC_04_Detect(void){
 				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
-					TxData2 = 0x12;
+					Fan_Gear_Down();
 				}else if(Gear == 0){
 					Working = 0;
-					TxData2 = 0x16;
+					Fan_Off();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
 				
-				Serial_SendByte(1, TxData2);
 				sprintf(Str, "当前档位：%d档", Gear);
 				Serial_SendString(2, Str);
 				Serial_SendByte(2, '\n');
 				break;
 			case 0x13:
-				Serial_SendByte(1, 0x13); 
-                Serial_SendByte(1, Gear);  
+				Serial_SetTxDataPacket(2, 0x13, Gear);
+				Serial_SendPacket(1, 2); 
 			
 				sprintf(Str, "当前档位：%d档", Gear);
 				Serial_SendString(2, Str);
@@ -174,7 +173,8 @@ void HC_04_Detect(void){
 			case 0x27:
 				if(!Count_Started)
 					Count_Start();
-				Serial_SendByte(1, 0x27);
+				Serial_SetTxDataPacket(1, 0x27);
+				Serial_SendPacket(1, 1); 
 				
 				Serial_SendString(2, Str);
                 Serial_SendByte(2, '\n');
@@ -188,8 +188,7 @@ void HC_04_Detect(void){
 			case 0x31:
 				MyRTC_ReadTime();
 				
-				switch(MyRTC_Time.Weekday)
-				{
+				switch(MyRTC_Time.Weekday){
 					case 0:
 						strcpy(Weekday ,"日");
 						break;
@@ -219,18 +218,12 @@ void HC_04_Detect(void){
 				Serial_SendString(2, Str);
                 Serial_SendByte(2, '\n');
 				
-				Serial_SendByte(1, 0x31);
 				Serial_ClearTxBuffer(); // 清空发送缓冲区
-				// 【数据包内容： 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
-				Serial_TxDataPacket[0] = (MyRTC_Time.Year >> 8) & 0xFF; // 年高8位
-				Serial_TxDataPacket[1] = MyRTC_Time.Year & 0xFF;        // 年低8位
-				Serial_TxDataPacket[2] = MyRTC_Time.Month;
-				Serial_TxDataPacket[3] = MyRTC_Time.Day;
-				Serial_TxDataPacket[4] = MyRTC_Time.Weekday;
-				Serial_TxDataPacket[5] = MyRTC_Time.Hour;
-				Serial_TxDataPacket[6] = MyRTC_Time.Minute;
-				Serial_TxDataPacket[7] = MyRTC_Time.Second;
-				Serial_SendPacket(1, 8);
+				// 【数据包内容： 0x31 + 年高 + 年低 + 月 + 日 + 星期 + 时 + 分 + 秒】
+				Serial_SetTxDataPacket(9, 0x31, (MyRTC_Time.Year >> 8) & 0xFF, MyRTC_Time.Year & 0xFF,
+					MyRTC_Time.Month, MyRTC_Time.Day, MyRTC_Time.Weekday, 
+					MyRTC_Time.Hour, MyRTC_Time.Minute, MyRTC_Time.Second);
+				Serial_SendPacket(1, 9);
 				break;
 			case 0x41:
 				for (int i = 0; i < 5; i++) {
@@ -240,14 +233,18 @@ void HC_04_Detect(void){
 					float temperature = temp_int + temp_dec / 10.0;
 					TempThreshold_Set(i+1, temperature);
 				}
+				Serial_SetTxDataPacket(1, 0x41);
+				Serial_SendPacket(1, 1); 
 				break;
 			case 0xEE:	//蓝牙已连接
-				Serial_SendByte(1, 0xFE);
+				Serial_TxDataPacket[0] = 0xEE;
+				Serial_SendPacket(1, 1); 
 				Serial_SendString(2, "蓝牙已开启");
                 Serial_SendByte(2, '\n');
 				break;
 			case 0xEF:	//蓝牙已断开
-				Serial_SendByte(1, 0xFF);
+				Serial_TxDataPacket[0] = 0xEF;
+				Serial_SendPacket(1, 1); 
 				Serial_SendString(2, "蓝牙已断开");
                 Serial_SendByte(2, '\n');
 				break;
