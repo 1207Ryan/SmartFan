@@ -36,6 +36,7 @@ extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
 extern uint8_t Count_Started;
 extern uint32_t cnt;
+extern volatile uint8_t Music_IsOn;
 char Weekday[2];
 
 void HC_04_Init(void){
@@ -109,8 +110,10 @@ void HC_04_Detect(void){
 				if(Gear > 0){
 					Gear--;
 					Fan_Gear_Down();
+					if(Gear == 0){
+						Working = 0;
+					}
 				}else if(Gear == 0){
-					Working = 0;
 					Fan_Off();
 				}
 				Last_Gear = Gear;
@@ -235,17 +238,42 @@ void HC_04_Detect(void){
 				}
 				Serial_SetTxDataPacket(1, 0x41);
 				Serial_SendPacket(1, 1); 
-				break;
-			case 0xEE:	//蓝牙已连接
-				Serial_TxDataPacket[0] = 0xEE;
-				Serial_SendPacket(1, 1); 
-				Serial_SendString(2, "蓝牙已开启");
+				Serial_SendString(2, "温度阈值已设置");
                 Serial_SendByte(2, '\n');
 				break;
-			case 0xEF:	//蓝牙已断开
-				Serial_TxDataPacket[0] = 0xEF;
+			case 0x46:
+				Volume_Set(Serial2_RxDataPacket[1]);
+				sprintf(Str, "语音音量已调整为:%d", Serial2_RxDataPacket[1]);
+				Serial_SendString(2, Str);
+                Serial_SendByte(2, '\n');
+				break;
+			case 0x7E:
+				if(Serial2_RxDataPacket[3] == 0x0D){//播放命令
+					Music_IsOn = 1;
+				}else if(Serial2_RxDataPacket[3] == 0x0E){//暂停命令
+					Music_IsOn = 0;
+				}else if(Serial2_RxDataPacket[3] == 0x01){//下一首
+					Music_IsOn = 1;
+				}else if(Serial2_RxDataPacket[3] == 0x02){//上一首
+					Music_IsOn = 1;
+				}
+				for(uint8_t i = 0; i < 8; i++){
+					Serial_TxDataPacket[i] = Serial2_RxDataPacket[i];
+				}
+				Serial_SendPacket(1, 8);
+				Serial_SendString(2, "收到音乐操作指令");
+                Serial_SendByte(2, '\n');
+				break;
+			case 0xEE:	//蓝牙已断开
+				Serial_TxDataPacket[0] = 0xEE;
 				Serial_SendPacket(1, 1); 
 				Serial_SendString(2, "蓝牙已断开");
+                Serial_SendByte(2, '\n');
+				break;
+			case 0xEF:	//蓝牙已连接
+				Serial_TxDataPacket[0] = 0xEF;
+				Serial_SendPacket(1, 1); 
+				Serial_SendString(2, "蓝牙已连接");
                 Serial_SendByte(2, '\n');
 				break;
 		}

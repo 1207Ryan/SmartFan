@@ -4,7 +4,7 @@
 #include "AD.h"
 
 /*
-AO - PA3
+AO - PA0
 */
 
 uint16_t AD_Value;			  	//定义用于存放AD转换结果的全局数组
@@ -32,12 +32,12 @@ void AD_Init(void)
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-	GPIO_InitStructure.GPIO_Pin = ADC_Pin;
+	GPIO_InitStructure.GPIO_Pin = GPIO_ADC_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);					//将PA1引脚初始化为模拟输入
+	GPIO_Init(GPIO_ADC_PORT, &GPIO_InitStructure);					//将PA1引脚初始化为模拟输入
 
 	/*规则组通道配置*/
-	ADC_RegularChannelConfig(ADC1, ADC_Channel, 1, ADC_SampleTime_55Cycles5);	//规则组序列1的位置，配置为通道0
+	ADC_RegularChannelConfig(ADC1, ADC_CHANNEL, 1, ADC_SampleTime_55Cycles5);	//规则组序列1的位置，配置为通道0
 
 	/*ADC初始化*/
 	ADC_InitTypeDef ADC_InitStructure;											//定义结构体变量

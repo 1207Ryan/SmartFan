@@ -307,8 +307,10 @@ void Menu2_Fan(void){
 				if(Gear > 0){
 					Gear--;
 					Fan_Gear_Down();
+					if(Gear == 0){
+						Working = 0;
+					}
 				}else if(Gear == 0){
-					Working = 0;
 					Fan_Off();
 				}
 				Last_Gear = Gear;

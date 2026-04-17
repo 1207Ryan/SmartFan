@@ -27,9 +27,9 @@ volatile uint8_t IsSafe = 1;
 float current_dist;
 
 void Timer_Init(void){
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	
-	TIM_InternalClockConfig(TIM3);
+	TIM_InternalClockConfig(TIM2);
 	
 	//CK_PSC/（PSC+1）/（ARR+1）
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
@@ -38,22 +38,22 @@ void Timer_Init(void){
 	TIM_TimeBaseInitStruct.TIM_Period = 1000 - 1;				//ARR 定时器数到 999 就 “溢出”（更新），触发中断
 	TIM_TimeBaseInitStruct.TIM_Prescaler = 72 - 1;			//PSC 把 72MHz 时钟分频：72MHz ÷ PSC = （每 .. μs 数 1 个数）
 	TIM_TimeBaseInitStruct.TIM_RepetitionCounter = 0;
-	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStruct);
+	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStruct);
 	
-	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+	TIM_ClearFlag(TIM2, TIM_FLAG_Update);
 	
-	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	
 	NVIC_InitTypeDef NVIC_InitStruct;
-	NVIC_InitStruct.NVIC_IRQChannel = TIM3_IRQn;
+	NVIC_InitStruct.NVIC_IRQChannel = TIM2_IRQn;
 	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;	//抢占
 	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 1;
 	NVIC_Init(&NVIC_InitStruct);
 	
-	TIM_Cmd(TIM3, ENABLE);
+	TIM_Cmd(TIM2, ENABLE);
 }
 
 /**
@@ -90,9 +90,9 @@ void Temp_Match_Gear(void){
 	}
 }
 
-void TIM3_IRQHandler(void){
-	if(TIM_GetITStatus(TIM3, TIM_IT_Update) == SET){
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+void TIM2_IRQHandler(void){
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET){
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 		
 		static uint16_t refresh_tick = 0; // 刷新计时，控制温度更新频率
 		refresh_tick++;

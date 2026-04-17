@@ -1,8 +1,9 @@
 #ifndef __AD_H
 #define __AD_H
 
-#define ADC_Pin GPIO_Pin_7
-#define ADC_Channel ADC_Channel_7
+#define GPIO_ADC_PIN GPIO_Pin_0
+#define GPIO_ADC_PORT GPIOA
+#define ADC_CHANNEL ADC_Channel_0
 
 // ===== 硬件参数配置=====
 #define NTC_R_REF    10000.0f  // 分压电阻值

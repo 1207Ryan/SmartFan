@@ -33,7 +33,7 @@ int main(void)
 	
 	OLED_Clear();
 	OLED_Update();
-	
+
 	while (1)
 	{
 		Menu1();

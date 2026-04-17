@@ -1,6 +1,10 @@
 #ifndef __MOTOR_H
 #define __MOTOR_H
 
+#define GPIO_PIN_AIN1 GPIO_Pin_1
+#define GPIO_PIN_AIN2 GPIO_Pin_0
+#define GPIO_PORT_AIN GPIOB
+
 #define MOTOR_SPEED_0  0       // 0档对应电机转速
 #define MOTOR_SPEED_1  20      // 1档对应电机转速
 #define MOTOR_SPEED_2  40      // 2档对应电机转速
