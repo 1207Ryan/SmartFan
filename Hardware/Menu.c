@@ -9,9 +9,11 @@
 #include "HC_SR04.h"
 #include "Count_Down.h"
 #include "Timer.h"
-#include "Serial.h"
 #include "ESP8266.h"
 #include "Voice_Recognition.h"
+#include "HC_04.h"
+#include <stdio.h>
+#include <string.h> 
 
 uint8_t CurrSelect1 = 1;
 uint8_t CurrSelect2 = 1;
@@ -20,10 +22,10 @@ uint8_t CurrSelect4 = 1;
 uint8_t CurrState = 0;
 
 float Temp_Gear_1 = 20.0f;  // 1档温度阈值
-float Temp_Gear_2 = 28.0f;  // 2档温度阈值
-float Temp_Gear_3 = 36.0f;  // 3档温度阈值
-float Temp_Gear_4 = 44.0f;  // 4档温度阈值
-float Temp_Gear_5 = 52.0f;  // 5档温度阈值
+float Temp_Gear_2 = 25.0f;  // 2档温度阈值
+float Temp_Gear_3 = 30.0f;  // 3档温度阈值
+float Temp_Gear_4 = 35.0f;  // 4档温度阈值
+float Temp_Gear_5 = 40.0f;  // 5档温度阈值
 
 volatile uint8_t Working = 0;
 volatile uint8_t Gear;
@@ -36,6 +38,7 @@ volatile uint8_t Music_IsOn = 0;
 extern volatile uint8_t IsSafe;
 extern uint32_t cnt;
 extern uint8_t Count_Started;
+extern char Str[128];
 
 uint8_t Menu1(void){
 	uint8_t Menu1_Select = 0;
@@ -201,8 +204,8 @@ void Menu2_Temp(){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
-				Fan_On();
-				//Serial_SendByte(1, 0x01);
+				Voice_Fan_On();//Serial_SendByte(1, 0x01);
+				BlueTooth_Fan_On();
 				Menu2_Select = 0;
 				break;
 			case 3:		//停止风扇
@@ -213,8 +216,8 @@ void Menu2_Temp(){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Fan_Off();
-				//Serial_SendByte(1, 0x02);
+				Voice_Fan_Off();//Serial_SendByte(1, 0x02);
+				BlueTooth_Fan_Off();
 				Menu2_Select = 0;
 				break;
 		}
@@ -293,12 +296,13 @@ void Menu2_Fan(void){
 				AD_Collect_Stop();
 				if(Gear < 5){
 					Gear++;
-					Fan_Gear_Up();
+					Voice_Fan_Gear_Up();
 				}else if(Gear >= 5){
-					Fan_Gear_Max();
+					Voice_Fan_Gear_Max();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
+				BlueTooth_Fan_Gear_Up();
 				Menu2_Select = 0;
 				break;
 			case 3:		//降档
@@ -306,15 +310,16 @@ void Menu2_Fan(void){
 				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
-					Fan_Gear_Down();
+					Voice_Fan_Gear_Down();
 					if(Gear == 0){
 						Working = 0;
 					}
 				}else if(Gear == 0){
-					Fan_Off();
+					Voice_Fan_Off();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
+				BlueTooth_Fan_Gear_Down();
 				Menu2_Select = 0;
 				break;
 			case 4:		//停止
@@ -324,7 +329,7 @@ void Menu2_Fan(void){
 				Last_Gear = 0;
 				Motor_Stop();
 				Working = 0;
-				Fan_Off();
+				Voice_Fan_Off();
 				Menu2_Select = 0;
 				break;
 		}
@@ -411,10 +416,13 @@ void Menu2_CountDown(void){
 				break;
 			case 3:
 				Menu2_Select = 0;
-				if(!Count_Started)
+				if(!Count_Started){
 					Count_Start();
-				else
+					BlueTooth_Start_Countdown();
+				}else{
 					Count_Stop();
+					BlueTooth_Stop_Countdown();
+				}
 				break;
 		}
 	}
@@ -490,6 +498,7 @@ void Menu3_CountDown(void){
 		
 		switch(Menu3_Select){
 			case 1:
+				BlueTooth_Set_Countdown();
 				Menu3_Select = 0;
 				CurrSelect3 = 1;
 				return;
@@ -1139,7 +1148,8 @@ void Menu3_SetTempThreshold(uint8_t TempThresHold_x){
 			case 1:
 				Menu3_Select = 0;
 				CurrSelect3 = 1;
-				SetTempThreshold();
+				Voice_SetTempThreshold();
+				BlueTooth_SetTempThreshold();
 				return;
 			case 2:
 				Menu3_Select = 0;
@@ -1227,27 +1237,25 @@ void Menu2_Music(){
 				CurrSelect2 = 1;
 				return;
 			case 2:	
-				Serial_ClearTxBuffer();
 				if(Music_IsOn == 1){//正在播放
-					Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
+					Voice_Music_Pause();
 					Music_IsOn = 0;
+					BlueTooth_SendString("暂停");
 				}else{//未在播放
-					Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+					Voice_Music_Play();
 					Music_IsOn = 1;
+					BlueTooth_SendString("播放");
 				}
-				Serial_SendPacket(1, 8);
 				Menu2_Select = 0;
 				break;
 			case 3:	//下一首
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xEF);//下一首
-				Serial_SendPacket(1, 8);
+				Voice_Music_Next();
+				BlueTooth_SendString("下一首");
 				Menu2_Select = 0;
 				break;
 			case 4:	//上一首
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);//上一首
-				Serial_SendPacket(1, 8);
+				Voice_Music_Previous();
+				BlueTooth_SendString("上一首");
 				Menu2_Select = 0;
 				break;
 			case 5:
@@ -1325,18 +1333,16 @@ void Menu3_SetMusicVolume(void){
 				if(MusicVolume < 30){
 					MusicVolume++;
 				}
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, MusicVolume, 0xEF);
-				Serial_SendPacket(1, 8);
+				Voice_Music_SetVolume(MusicVolume);
+				BlueTooth_SetMusicVolume(MusicVolume);
 				break;
 			case 3:
 				Menu3_Select = 0;
 				if(MusicVolume > 1){
 					MusicVolume--;
 				}
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, MusicVolume, 0xEF);
-				Serial_SendPacket(1, 8);
+				Voice_Music_SetVolume(MusicVolume);
+				BlueTooth_SetMusicVolume(MusicVolume);
 				break;
 		}
 	}
@@ -1389,21 +1395,18 @@ void Menu3_SetMusicOrder(void){
 				return;
 			case 2:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x19, 0x00, 0x00, 0x00, 0xEF);//单曲循环开启
-				Serial_SendPacket(1, 8);
+				Voice_Music_SingleCycle();
+				BlueTooth_SendString("单曲循环");
 				break;
 			case 3:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x11, 0x00, 0x00, 0x01, 0xEF);//顺序播放
-				Serial_SendPacket(1, 8);
+				Voice_Music_SequentialPlay();
+				BlueTooth_SendString("顺序播放");
 				break;
 			case 4:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x18, 0x00, 0x00, 0x00, 0xEF);//随机播放
-				Serial_SendPacket(1, 8);
+				Voice_Music_ShufflePlay();
+				BlueTooth_SendString("随机播放");
 				break;
 		}
 	}
@@ -1456,21 +1459,18 @@ void Menu3_SetMusic(void){
 				return;
 			case 2:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x01, 0xEF);//周杰伦
-				Serial_SendPacket(1, 8);
+				Voice_Music_PlayJayChou();
+				BlueTooth_SendString("指定播放周杰伦的歌曲");
 				break;
 			case 3:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x02, 0xEF);//林俊杰
-				Serial_SendPacket(1, 8);
+				Voice_Music_PlayJJ();
+				BlueTooth_SendString("指定播放林俊杰的歌曲");
 				break;
 			case 4:
 				Menu3_Select = 0;
-				Serial_ClearTxBuffer();
-				Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x03, 0xEF);//王力宏
-				Serial_SendPacket(1, 8);
+				Voice_Music_PlayLeehom();
+				BlueTooth_SendString("指定播放王力宏的歌曲");
 				break;
 		}
 	}
@@ -1532,18 +1532,18 @@ void Menu2_SetVoiceVolume(void){
 				Menu2_Select = 0;
 				if(VoiceVolume < 7){
 					VoiceVolume++;
-					Volume_Up();
+					Voice_Volume_Up();
 				}else{
-					Volume_Max();
+					Voice_Volume_Max();
 				}
 				break;
 			case 3://音量-1
 				Menu2_Select = 0;
 				if(VoiceVolume > 1){
 					VoiceVolume--;
-					Volume_Down();
+					Voice_Volume_Down();
 				}else{
-					Volume_Min();
+					Voice_Volume_Min();
 				}
 				break;
 		}

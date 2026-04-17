@@ -28,7 +28,7 @@ uint8_t TxData2;
 uint8_t RxData2;
 extern uint8_t temp_int;
 extern uint8_t temp_dec;
-char Str[30];
+char Str[128];
 extern volatile uint8_t Working;
 extern volatile uint8_t Gear;
 extern volatile uint8_t Last_Gear;
@@ -36,7 +36,9 @@ extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
 extern uint8_t Count_Started;
 extern uint32_t cnt;
+extern volatile uint8_t VoiceVolume;
 extern volatile uint8_t Music_IsOn;
+extern volatile uint8_t MusicVolume;
 char Weekday[2];
 
 void HC_04_Init(void){
@@ -53,7 +55,7 @@ void HC_04_Detect(void){
 				Working = 1;
 				Temp2Gear = 1;
 				Last_Gear = 0;
-				Fan_On();
+				Voice_Fan_On();
 				//Serial_SendByte(1, 0x01);
 				Serial_SendString(2, "风扇已开启");
                 Serial_SendByte(2, '\n');
@@ -66,7 +68,7 @@ void HC_04_Detect(void){
 				Gear = 0;
 				Last_Gear = 0;
 				Motor_Stop();
-				Fan_Off();
+				Voice_Fan_Off();
 				//Serial_SendByte(1, 0x02);
 				Serial_SendString(2, "风扇已关闭");
                 Serial_SendByte(2, '\n');
@@ -90,10 +92,10 @@ void HC_04_Detect(void){
 				Working = 1;
 				AD_Collect_Stop();
 				if(Gear >= 5){
-					Fan_Gear_Max();	//已经是最大档位
+					Voice_Fan_Gear_Max();	//已经是最大档位
 				}else if(Gear < 5){
 					Gear++;
-					Fan_Gear_Up();	//档位已上升
+					Voice_Fan_Gear_Up();	//档位已上升
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
@@ -109,12 +111,12 @@ void HC_04_Detect(void){
 				AD_Collect_Stop();
 				if(Gear > 0){
 					Gear--;
-					Fan_Gear_Down();
+					Voice_Fan_Gear_Down();
 					if(Gear == 0){
 						Working = 0;
 					}
 				}else if(Gear == 0){
-					Fan_Off();
+					Voice_Fan_Off();
 				}
 				Last_Gear = Gear;
 				Motor_SetGear(Gear);
@@ -242,20 +244,23 @@ void HC_04_Detect(void){
                 Serial_SendByte(2, '\n');
 				break;
 			case 0x46:
-				Volume_Set(Serial2_RxDataPacket[1]);
-				sprintf(Str, "语音音量已调整为:%d", Serial2_RxDataPacket[1]);
+				VoiceVolume = Serial2_RxDataPacket[1];
+				Voice_Volume_Set(VoiceVolume);
+				sprintf(Str, "语音音量已调整为:%d", VoiceVolume);
 				Serial_SendString(2, Str);
                 Serial_SendByte(2, '\n');
 				break;
 			case 0x7E:
-				if(Serial2_RxDataPacket[3] == 0x0D){//播放命令
-					Music_IsOn = 1;
-				}else if(Serial2_RxDataPacket[3] == 0x0E){//暂停命令
-					Music_IsOn = 0;
-				}else if(Serial2_RxDataPacket[3] == 0x01){//下一首
+				if(Serial2_RxDataPacket[3] == 0x01){//下一首
 					Music_IsOn = 1;
 				}else if(Serial2_RxDataPacket[3] == 0x02){//上一首
 					Music_IsOn = 1;
+				}else if(Serial2_RxDataPacket[3] == 0x0D){//播放命令
+					Music_IsOn = 1;
+				}else if(Serial2_RxDataPacket[3] == 0x0E){//暂停命令
+					Music_IsOn = 0;
+				}else if(Serial2_RxDataPacket[3] == 0x06){//音量设置
+					MusicVolume = Serial2_RxDataPacket[6];
 				}
 				for(uint8_t i = 0; i < 8; i++){
 					Serial_TxDataPacket[i] = Serial2_RxDataPacket[i];
@@ -278,4 +283,58 @@ void HC_04_Detect(void){
 				break;
 		}
 	}
+}
+
+void BlueTooth_Fan_On(void){
+	Serial_SendString(2, "开启风扇");
+    Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Fan_Off(void){
+	Serial_SendString(2, "关闭风扇");
+    Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Fan_Gear_Up(void){
+	Serial_SendString(2, "升档");
+    Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Fan_Gear_Down(void){
+	Serial_SendString(2, "降档");
+    Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Set_Countdown(void){
+	sprintf(Str, "倒计时:%d时:%d分:%d秒", Get_Count()/3600, Get_Count()%3600/60, Get_Count()%3600%60);
+	Serial_SendString(2, Str);
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Start_Countdown(void){
+	Serial_SendString(2, "开始倒计时");
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_Stop_Countdown(void){
+	Serial_SendString(2, "停止倒计时");
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_SetTempThreshold(void){
+	sprintf(Str, "1档温度阈值:%.1f,2档温度阈值:%.1f,3档温度阈值:%.1f,4档温度阈值:%.1f,5档温度阈值:%.1f", 
+		Temp_Gear_1, Temp_Gear_2, Temp_Gear_3, Temp_Gear_4, Temp_Gear_5);
+	Serial_SendString(2, Str);
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_SetMusicVolume(uint8_t MusicVolume){
+	sprintf(Str, "音量设置为%d", MusicVolume);
+	Serial_SendString(2, Str);
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_SendString(char *Str){
+	Serial_SendString(2, Str);
+	Serial_SendByte(2, '\n');
 }

@@ -8,6 +8,7 @@
 #include "HC_SR04.h"
 #include "Count_Down.h"
 #include "Timer.h"
+#include <stdio.h>
 #include <string.h> 
 #include "ESP8266.h"
 
@@ -32,6 +33,9 @@ extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
 extern uint8_t Count_Started;
 extern uint8_t VoiceVolume;
+extern volatile uint8_t Music_IsOn;
+extern volatile uint8_t MusicVolume;
+extern char Str[128];
 uint8_t Count_State = 9;
 uint8_t High_Byte;
 uint8_t Low_Byte;
@@ -326,6 +330,45 @@ void Voice_Recognition(void){
 				Serial_SetTxDataPacket(3, 0x33, weather_temp_u8, weather_code);//温度 , 天气代码
 				Serial_SendPacket(1, 3);
 				break;
+			case 0x46:
+				VoiceVolume = Serial1_RxDataPacket[1];
+				sprintf(Str, "语音音量已调整为:%d", VoiceVolume);
+				Serial_SendString(2, Str);
+                Serial_SendByte(2, '\n');
+				break;
+			case 0x7E:
+				if(Serial1_RxDataPacket[3] == 0x01){//下一首
+					Music_IsOn = 1;
+					sprintf(Str, "下一首");
+				}else if(Serial1_RxDataPacket[3] == 0x02){//上一首
+					Music_IsOn = 1;
+					sprintf(Str, "上一首");
+				}else if(Serial1_RxDataPacket[3] == 0x06){//音量设置
+					MusicVolume = Serial1_RxDataPacket[6];
+					sprintf(Str, "音量设置为%d", MusicVolume);
+				}else if(Serial1_RxDataPacket[3] == 0x0D || Serial1_RxDataPacket[3] == 0x09 || Serial1_RxDataPacket[3] == 0x12){//播放命令
+					Music_IsOn = 1;
+					sprintf(Str, "播放");
+				}else if(Serial1_RxDataPacket[3] == 0x0E){//暂停命令
+					Music_IsOn = 0;
+					sprintf(Str, "暂停");
+				}else if(Serial1_RxDataPacket[3] == 0x11){//顺序播放
+					sprintf(Str, "顺序播放");
+				}else if(Serial1_RxDataPacket[3] == 0x18){//随机播放
+					sprintf(Str, "随机播放");
+				}else if(Serial1_RxDataPacket[3] == 0x19){//单曲循环
+					sprintf(Str, "单曲循环");
+				}else if(Serial1_RxDataPacket[3] == 0x17){//指定歌手
+					if(Serial1_RxDataPacket[3] == 0x01)
+						sprintf(Str, "指定播放周杰伦的歌曲");
+					else if(Serial1_RxDataPacket[3] == 0x02)
+						sprintf(Str, "指定播放林俊杰的歌曲");
+					else if(Serial1_RxDataPacket[3] == 0x03)
+						sprintf(Str, "指定播放王力宏的歌曲");
+				}
+				Serial_SendString(2, Str);
+                Serial_SendByte(2, '\n');
+				break;
 		}
 	}
 }
@@ -335,57 +378,123 @@ void Distance_Warn(void){
 	Serial_SendPacket(1, 1); 
 }
 
-void Fan_On(void){
+void Voice_Fan_On(void){
 	Serial_SetTxDataPacket(1, 0x01);
 	Serial_SendPacket(1, 1);
 }
 
-void Fan_Off(void){
+void Voice_Fan_Off(void){
 	Serial_SetTxDataPacket(1, 0x02);
 	Serial_SendPacket(1, 1);
 }
 
-void Fan_Gear_Up(void){
+void Voice_Fan_Gear_Up(void){
 	Serial_SetTxDataPacket(1, 0x11);
 	Serial_SendPacket(1, 1);
 }
 
-void Fan_Gear_Max(void){
+void Voice_Fan_Gear_Max(void){
 	Serial_SetTxDataPacket(1, 0x15);
 	Serial_SendPacket(1, 1);
 }
 
-void Fan_Gear_Down(void){
+void Voice_Fan_Gear_Down(void){
 	Serial_SetTxDataPacket(1, 0x12);
 	Serial_SendPacket(1, 1);
 }
 
-void SetTempThreshold(void){
+void Voice_SetTempThreshold(void){
 	Serial_SetTxDataPacket(1, 0x41);
 	Serial_SendPacket(1, 1); 
 }
 
-void Volume_Up(void){
+void Voice_Volume_Up(void){
 	Serial_SetTxDataPacket(1, 0x42);
 	Serial_SendPacket(1, 1); 
 }
 
-void Volume_Max(void){
+void Voice_Volume_Max(void){
 	Serial_SetTxDataPacket(1, 0x44);
 	Serial_SendPacket(1, 1); 
 }
 
-void Volume_Down(void){
+void Voice_Volume_Down(void){
 	Serial_SetTxDataPacket(1, 0x43);
 	Serial_SendPacket(1, 1); 
 }
 
-void Volume_Min(void){
+void Voice_Volume_Min(void){
 	Serial_SetTxDataPacket(1, 0x45);
 	Serial_SendPacket(1, 1); 
 }
 
-void Volume_Set(uint8_t Volume){
+void Voice_Volume_Set(uint8_t Volume){
 	Serial_SetTxDataPacket(2, 0x46, Volume);
 	Serial_SendPacket(1, 2); 
+}
+
+void Voice_Music_Play(void){//播放
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_Pause(void){//暂停
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0E, 0x00, 0x00, 0x00, 0xEF);//暂停
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_Next(void){//下一首
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x01, 0x00, 0x00, 0x00, 0xEF);//下一首
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_Previous(void){//上一首
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x02, 0x00, 0x00, 0x00, 0xEF);//上一首
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_SetVolume(uint8_t MusicVolume){//设置音乐音量
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x06, 0x00, 0x00, MusicVolume, 0xEF);
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_SingleCycle(void){//单曲循环
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x19, 0x00, 0x00, 0x00, 0xEF);//单曲循环开启
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_SequentialPlay(void){//顺序播放
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x11, 0x00, 0x00, 0x01, 0xEF);//顺序播放
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_ShufflePlay(void){//随机播放
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x18, 0x00, 0x00, 0x00, 0xEF);//随机播放
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_PlayJayChou(void){//播放周杰伦的歌曲
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x01, 0xEF);//周杰伦
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_PlayJJ(void){//播放林俊杰的歌曲
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x02, 0xEF);//林俊杰
+	Serial_SendPacket(1, 8);
+}
+
+void Voice_Music_PlayLeehom(void){//播放王力宏的歌曲
+	Serial_ClearTxBuffer();
+	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x03, 0xEF);//王力宏
+	Serial_SendPacket(1, 8);
 }

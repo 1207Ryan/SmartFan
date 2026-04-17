@@ -1,7 +1,7 @@
 #ifndef __MENU_H
 #define __MENU_H
 
-#define TotalSelect 9
+#define TotalSelect 8
 
 extern uint8_t CurrSelect1;
 extern uint8_t CurrSelect2;
