@@ -250,6 +250,25 @@ void HC_04_Detect(void){
 				Serial_SendString(2, Str);
                 Serial_SendByte(2, '\n');
 				break;
+			case 0x47:
+				for (int i = 0; i < 5; i++) {
+					uint8_t Motor_Speed = Serial2_RxDataPacket[1 + i];   // 整数部分
+
+					Motor_Speed_Set(i+1, Motor_Speed);
+				}
+				Serial_SetTxDataPacket(1, 0x47);
+				Serial_SendPacket(1, 1); 
+				Serial_SendString(2, "各档位转速已设置");
+                Serial_SendByte(2, '\n');
+				break;
+			case 0x48:
+				Safe_Distance = Serial2_RxDataPacket[1];
+				Safe_Distance += 0.1 * Serial2_RxDataPacket[2];
+				Serial_SetTxDataPacket(1, 0x48);
+				Serial_SendPacket(1, 1); 
+				Serial_SendString(2, "安全距离已设置");
+                Serial_SendByte(2, '\n');
+				break;
 			case 0x7E:
 				if(Serial2_RxDataPacket[3] == 0x01){//下一首
 					Music_IsOn = 1;
@@ -318,6 +337,13 @@ void BlueTooth_Start_Countdown(void){
 
 void BlueTooth_Stop_Countdown(void){
 	Serial_SendString(2, "停止倒计时");
+	Serial_SendByte(2, '\n');
+}
+
+void BlueTooth_SetMotorSpeed(void){
+	sprintf(Str, "1档转速:%d,2档转速:%d,3档转速:%d,4档转速:%d,5档转速:%d", 
+		Motor_Speed_1, Motor_Speed_2, Motor_Speed_3, Motor_Speed_4, Motor_Speed_5);
+	Serial_SendString(2, Str);
 	Serial_SendByte(2, '\n');
 }
 

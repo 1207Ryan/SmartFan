@@ -1,6 +1,7 @@
 #include "stm32f10x.h"                  // Device header
 #include "HC_SR04.h"
 #include "Delay.h"
+#include "Menu.h"
 
 /*
 Trig - PA5
@@ -231,4 +232,14 @@ float HC_SR04_GetDistance(void)
     return CalcWindowAverage();
 }
 
+void Safe_Distance_Add(void){
+	Safe_Distance += 0.1;
+}
 
+void Safe_Distance_Sub(void){
+	Safe_Distance -= 0.1;
+}
+
+void Safe_Distance_Set(float Distance){
+	Safe_Distance = Distance;
+}

@@ -30,3 +30,4 @@
 .\objects\hc_sr04.o: .\Library\misc.h
 .\objects\hc_sr04.o: Hardware\HC_SR04.h
 .\objects\hc_sr04.o: .\System\Delay.h
+.\objects\hc_sr04.o: .\System\Menu.h

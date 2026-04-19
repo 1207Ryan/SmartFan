@@ -10,6 +10,7 @@ void BlueTooth_Fan_Gear_Down(void);
 void BlueTooth_Set_Countdown(void);
 void BlueTooth_Start_Countdown(void);
 void BlueTooth_Stop_Countdown(void);
+void BlueTooth_SetMotorSpeed(void);
 void BlueTooth_SetTempThreshold(void);
 void BlueTooth_SetMusicVolume(uint8_t MusicVolume);
 void BlueTooth_SendString(char *Str);

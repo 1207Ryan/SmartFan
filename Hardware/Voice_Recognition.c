@@ -20,7 +20,7 @@ STM32 PA10 - ASRPRO PB5/PA2
 0x2C:设置倒计时	依次说 小时：分钟：秒钟 每个块对应一个时间	0x2D:开始倒计时
 0x20 ~ 0x2B 对应0 ~ 55
 0x31:报时	0x32:联网校准时间		0x33:播报天气
-0x41:设置温度阈值		0x42:音量增加		0x43:音量减少		0x44:音量最大		0x45:音量最小		0x46:设置音量
+0x41:设置温度阈值		0x42:音量增加		0x43:音量减少		0x44:音量最大		0x45:音量最小		0x46:设置音量		0x47:设置转速
 */
 
 uint8_t RxData;
@@ -336,6 +336,12 @@ void Voice_Recognition(void){
 				Serial_SendString(2, Str);
                 Serial_SendByte(2, '\n');
 				break;
+			case 0x48:
+				Safe_Distance = Serial1_RxDataPacket[1];
+				sprintf(Str, "安全距离已调整为:%.1f", Safe_Distance);
+				Serial_SendString(2, Str);
+                Serial_SendByte(2, '\n');
+				break;
 			case 0x7E:
 				if(Serial1_RxDataPacket[3] == 0x01){//下一首
 					Music_IsOn = 1;
@@ -403,36 +409,6 @@ void Voice_Fan_Gear_Down(void){
 	Serial_SendPacket(1, 1);
 }
 
-void Voice_SetTempThreshold(void){
-	Serial_SetTxDataPacket(1, 0x41);
-	Serial_SendPacket(1, 1); 
-}
-
-void Voice_Volume_Up(void){
-	Serial_SetTxDataPacket(1, 0x42);
-	Serial_SendPacket(1, 1); 
-}
-
-void Voice_Volume_Max(void){
-	Serial_SetTxDataPacket(1, 0x44);
-	Serial_SendPacket(1, 1); 
-}
-
-void Voice_Volume_Down(void){
-	Serial_SetTxDataPacket(1, 0x43);
-	Serial_SendPacket(1, 1); 
-}
-
-void Voice_Volume_Min(void){
-	Serial_SetTxDataPacket(1, 0x45);
-	Serial_SendPacket(1, 1); 
-}
-
-void Voice_Volume_Set(uint8_t Volume){
-	Serial_SetTxDataPacket(2, 0x46, Volume);
-	Serial_SendPacket(1, 2); 
-}
-
 void Voice_Music_Play(void){//播放
 	Serial_ClearTxBuffer();
 	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x0D, 0x00, 0x00, 0x00, 0xEF);//播放
@@ -497,4 +473,39 @@ void Voice_Music_PlayLeehom(void){//播放王力宏的歌曲
 	Serial_ClearTxBuffer();
 	Serial_SetTxDataPacket(8, 0x7E, 0xFF, 0x06, 0x17, 0x00, 0x00, 0x03, 0xEF);//王力宏
 	Serial_SendPacket(1, 8);
+}
+
+void Voice_SetMotorSpeed(void){
+	Serial_SetTxDataPacket(1, 0x47);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_SetTempThreshold(void){
+	Serial_SetTxDataPacket(1, 0x41);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_Volume_Up(void){
+	Serial_SetTxDataPacket(1, 0x42);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_Volume_Max(void){
+	Serial_SetTxDataPacket(1, 0x44);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_Volume_Down(void){
+	Serial_SetTxDataPacket(1, 0x43);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_Volume_Min(void){
+	Serial_SetTxDataPacket(1, 0x45);
+	Serial_SendPacket(1, 1); 
+}
+
+void Voice_Volume_Set(uint8_t Volume){
+	Serial_SetTxDataPacket(2, 0x46, Volume);
+	Serial_SendPacket(1, 2); 
 }

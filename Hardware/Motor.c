@@ -41,3 +41,33 @@ void Motor_Stop(void){
 	GPIO_ResetBits(GPIO_PORT_AIN, GPIO_PIN_AIN2);
 	PWM_SetCompare2(0);
 }
+
+void Motor_Speed_Add(uint8_t Gear_x){
+	switch(Gear_x){
+		case 1:Motor_Speed_1 += 1;break;
+		case 2:Motor_Speed_2 += 1;break;
+		case 3:Motor_Speed_3 += 1;break;
+		case 4:Motor_Speed_4 += 1;break;
+		case 5:Motor_Speed_5 += 1;break;
+	}
+}
+
+void Motor_Speed_Sub(uint8_t Gear_x){
+	switch(Gear_x){
+		case 1:Motor_Speed_1 -= 1;break;
+		case 2:Motor_Speed_2 -= 1;break;
+		case 3:Motor_Speed_3 -= 1;break;
+		case 4:Motor_Speed_4 -= 1;break;
+		case 5:Motor_Speed_5 -= 1;break;
+	}
+}
+
+void Motor_Speed_Set(uint8_t Gear_x, uint8_t Motor_Speed){
+	switch(Gear_x){
+		case 1:Motor_Speed_1 = Motor_Speed;break;
+		case 2:Motor_Speed_2 = Motor_Speed;break;
+		case 3:Motor_Speed_3 = Motor_Speed;break;
+		case 4:Motor_Speed_4 = Motor_Speed;break;
+		case 5:Motor_Speed_5 = Motor_Speed;break;
+	}
+}

@@ -30,7 +30,7 @@
 .\objects\timer.o: .\Library\misc.h
 .\objects\timer.o: System\Delay.h
 .\objects\timer.o: .\Hardware\Key.h
-.\objects\timer.o: .\Hardware\Menu.h
+.\objects\timer.o: System\Menu.h
 .\objects\timer.o: .\Hardware\AD.h
 .\objects\timer.o: .\Hardware\HC_SR04.h
 .\objects\timer.o: .\Hardware\Motor.h

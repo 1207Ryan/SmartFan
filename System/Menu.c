@@ -21,11 +21,20 @@ uint8_t CurrSelect3 = 1;
 uint8_t CurrSelect4 = 1;
 uint8_t CurrState = 0;
 
+uint8_t Motor_Speed_0 = 0;       // 0档对应电机转速
+uint8_t Motor_Speed_1 = 20;      // 1档对应电机转速
+uint8_t Motor_Speed_2 = 40;      // 2档对应电机转速
+uint8_t Motor_Speed_3 = 60;      // 3档对应电机转速
+uint8_t Motor_Speed_4 = 80;      // 4档对应电机转速
+uint8_t Motor_Speed_5 = 100;     // 5档对应电机转速
+
 float Temp_Gear_1 = 20.0f;  // 1档温度阈值
 float Temp_Gear_2 = 25.0f;  // 2档温度阈值
 float Temp_Gear_3 = 30.0f;  // 3档温度阈值
 float Temp_Gear_4 = 35.0f;  // 4档温度阈值
 float Temp_Gear_5 = 40.0f;  // 5档温度阈值
+
+float Safe_Distance = 3.0f;  // 安全距离（单位cm）
 
 volatile uint8_t Working = 0;
 volatile uint8_t Gear;
@@ -53,10 +62,10 @@ uint8_t Menu1(void){
 				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
 			else if(CurrSelect1 >= 5 && CurrSelect1 <= 8){
-				OLED_ShowString(0, 0,  "天气显示        	  ", OLED_8X16);
-				OLED_ShowString(0, 16, "调整温度阈值     	  ", OLED_8X16);
-				OLED_ShowString(0, 32, "音乐               ", OLED_8X16);
-				OLED_ShowString(0, 48, "调整语音音量         ", OLED_8X16);
+				OLED_ShowString(0, 0,  "天气显示        	     ", OLED_8X16);
+				OLED_ShowString(0, 16, "音乐                  ", OLED_8X16);
+				OLED_ShowString(0, 32, "设置                  ", OLED_8X16);
+				OLED_ShowString(0, 48, "                     ", OLED_8X16);
 			}else if(CurrSelect1 >= 9 && CurrSelect1 <= 9){
 				OLED_ShowString(0, 0,  "调试                   ", OLED_8X16);
 				OLED_ShowString(0, 16, "                      ", OLED_8X16);
@@ -114,15 +123,14 @@ uint8_t Menu1(void){
 				break;
 			case 6:
 				Menu1_Select = 0;
-				Menu2_SetTempThreshold();
+				Menu2_Music();
 				break;
 			case 7:
 				Menu1_Select = 0;
-				Menu2_Music();
+				Menu2_Settings();
 				break;
 			case 8:
 				Menu1_Select = 0;
-				Menu2_SetVoiceVolume();
 				break;
 			case 9:
 				Menu1_Select = 0;
@@ -984,186 +992,6 @@ void Menu2_Weather(void){
 }
 
 /**
-  * @brief 温度阈值设置二级菜单
-  * @param 无
-  * @retval 无
-  */
-void Menu2_SetTempThreshold(void){
-	uint8_t Menu2_Select = 0;
-	
-	while(1){
-		if(CurrState == 0){
-			OLED_Clear();
-			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
-				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
-				OLED_ShowString(0, 16, "5档阈值: XX.X ℃   ", OLED_8X16);
-				OLED_ShowString(0, 32, "4档阈值: XX.X ℃   ", OLED_8X16);
-				OLED_ShowString(0, 48, "3档阈值: XX.X ℃   ", OLED_8X16);
-			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 7){
-				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
-				OLED_ShowString(0, 16, "2档阈值: XX.X ℃   ", OLED_8X16);
-				OLED_ShowString(0, 32, "1档阈值: XX.X ℃   ", OLED_8X16);
-			}
-			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-			OLED_Update();
-			CurrState = 1;
-		}else{
-			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
-				OLED_ClearArea(64, 16, 48, 16);
-				OLED_ClearArea(64, 32, 48, 16);
-				OLED_ClearArea(64, 48, 48, 16);
-				
-				OLED_ShowFloatNum(64, 16, Temp_Gear_5, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Temp_Gear_4, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);
-				
-				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-				OLED_UpdateArea(64, 16, 48, 16);
-				OLED_UpdateArea(64, 32, 48, 16);
-				OLED_UpdateArea(64, 48, 48, 16);
-			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 7){
-				OLED_ClearArea(64, 16, 48, 16);
-				OLED_ClearArea(64, 32, 48, 16);
-				
-				OLED_ShowFloatNum(64, 16, Temp_Gear_2, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Temp_Gear_1, 2, 1, OLED_8X16);
-				
-				OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
-				OLED_UpdateArea(64, 16, 48, 16);
-				OLED_UpdateArea(64, 32, 48, 16);
-			}
-		}
-		
-		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
-			CurrState = 0;
-			CurrSelect2--;
-			if(CurrSelect2 <= 0){
-				CurrSelect2 = 7;
-			}
-		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
-			CurrState = 0;
-			CurrSelect2++;
-			if(CurrSelect2 > 7){
-				CurrSelect2 = 1;
-			}
-		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
-			CurrState = 0;
-			OLED_Clear();
-			OLED_Update();
-			Menu2_Select = CurrSelect2;
-		}
-		
-		switch(Menu2_Select){
-			case 1:
-				Menu2_Select = 0;
-				CurrSelect2 = 1;
-				return;
-			case 2:
-				Menu2_Select = 0;
-				Menu3_SetTempThreshold(5);
-				break;
-			case 3:
-				Menu2_Select = 0;
-				Menu3_SetTempThreshold(4);
-				break;
-			case 4:
-				Menu2_Select = 0;
-				Menu3_SetTempThreshold(3);
-				return;
-			case 5:
-				Menu2_Select = 0;
-				CurrSelect2 = 1;
-				return;
-			case 6:
-				Menu2_Select = 0;
-				Menu3_SetTempThreshold(2);
-				break;
-			case 7:
-				Menu2_Select = 0;
-				Menu3_SetTempThreshold(1);
-				return;
-		}
-	}
-}
-
-/**
-  * @brief 温度阈值设置三级菜单
-  * @param 设置的温度阈值
-  * @retval 无
-  */
-void Menu3_SetTempThreshold(uint8_t TempThresHold_x){
-	uint8_t Menu3_Select = 0;
-	
-	while(1){
-		if(CurrState == 0){
-			OLED_Clear();
-			if(CurrSelect3 >= 1 && CurrSelect3 <= 3){
-				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
-				OLED_ShowString(0, 16, "阈值+0.5        ", OLED_8X16);
-				OLED_ShowString(0, 32, "阈值-0.5        ", OLED_8X16);
-			}
-			OLED_ShowNum(0, 48, TempThresHold_x, 1, OLED_8X16);
-			OLED_ShowString(8, 48, "档阈值: XX.X ℃  ", OLED_8X16);
-			
-			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
-			OLED_Update();
-			CurrState = 1;
-		}else{
-			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
-			OLED_ClearArea(64, 48, 48, 16); 
-			
-			switch(TempThresHold_x){
-				case 1:OLED_ShowFloatNum(64, 48, Temp_Gear_1, 2, 1, OLED_8X16);break;
-				case 2:OLED_ShowFloatNum(64, 48, Temp_Gear_2, 2, 1, OLED_8X16);break;
-				case 3:OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);break;
-				case 4:OLED_ShowFloatNum(64, 48, Temp_Gear_4, 2, 1, OLED_8X16);break;
-				case 5:OLED_ShowFloatNum(64, 48, Temp_Gear_5, 2, 1, OLED_8X16);break;
-			}
-
-			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
-			OLED_UpdateArea(64, 48, 48, 16);
-		}
-		
-		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
-			CurrState = 0;
-			CurrSelect3--;
-			if(CurrSelect3 <= 0){
-				CurrSelect3 = 3;
-			}
-		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
-			CurrState = 0;
-			CurrSelect3++;
-			if(CurrSelect3 > 3){
-				CurrSelect3 = 1;
-			}
-		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
-			CurrState = 0;
-			OLED_Clear();
-			OLED_Update();
-			Menu3_Select = CurrSelect3;
-		}
-		
-		switch(Menu3_Select){
-			case 1:
-				Menu3_Select = 0;
-				CurrSelect3 = 1;
-				Voice_SetTempThreshold();
-				BlueTooth_SetTempThreshold();
-				return;
-			case 2:
-				Menu3_Select = 0;
-				TempThreshold_Add(TempThresHold_x);
-				break;
-			case 3:
-				Menu3_Select = 0;
-				TempThreshold_Sub(TempThresHold_x);
-				break;
-		}
-	}
-}
-
-/**
   * @brief 音乐播放二级菜单
   * @param	无
   * @retval 无
@@ -1477,43 +1305,42 @@ void Menu3_SetMusic(void){
 }
 
 /**
-  * @brief 设置语音音量二级菜单
+  * @brief 设置二级菜单
   * @param 无
   * @retval 无
   */
-void Menu2_SetVoiceVolume(void){
+void Menu2_Settings(void){
 	uint8_t Menu2_Select = 0;
 	
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
+			if(CurrSelect2 >= 1 && CurrSelect2 <= 4){
+				OLED_ShowString(0, 0,  "<-                     	", OLED_8X16);
+				OLED_ShowString(0, 16, "调整各档位转速             ", OLED_8X16);
+				OLED_ShowString(0, 32, "调整温度阈值             	", OLED_8X16);
+				OLED_ShowString(0, 48, "调整语音音量               ", OLED_8X16);
+			}else if(CurrSelect2 >= 5 && CurrSelect2 <= 6){
+				OLED_ShowString(0, 0,  "<-                      ", OLED_8X16);
+				OLED_ShowString(0, 16, "调整安全距离               ", OLED_8X16);
+			}
 			
-			OLED_ShowString(0, 0,  "<-   当前音量:     ", OLED_8X16);
-			OLED_ShowString(0, 16, "音量+1            ", OLED_8X16);
-			OLED_ShowString(0, 32, "音量-1            ", OLED_8X16);
-			OLED_ShowString(0, 48, "                 ", OLED_8X16);
 			
-			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
+			OLED_ReverseArea(0, ((CurrSelect2 - 1)*16)%64, 128, 16);
 			OLED_Update();
 			CurrState = 1;
-		}else{
-			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
-			OLED_ClearArea(120, 0, 8, 16);
-			OLED_ShowNum(120, 0, VoiceVolume, 1, OLED_8X16);
-			OLED_ReverseArea(0, (CurrSelect2 - 1)*16, 128, 16);
-			OLED_UpdateArea(120, 0, 8, 16);
 		}
 		
 		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
 			CurrState = 0;
 			CurrSelect2--;
 			if(CurrSelect2 <= 0){
-				CurrSelect2 = 3;
+				CurrSelect2 = 6;
 			}
 		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
 			CurrState = 0;
 			CurrSelect2++;
-			if(CurrSelect2 > 3){
+			if(CurrSelect2 > 6){
 				CurrSelect2 = 1;
 			}
 		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
@@ -1528,8 +1355,444 @@ void Menu2_SetVoiceVolume(void){
 				Menu2_Select = 0;
 				CurrSelect2 = 1;
 				return;
-			case 2://音量+1
+			case 2:
 				Menu2_Select = 0;
+				Menu3_SetMotorSpeed();
+				break;
+			case 3:
+				Menu2_Select = 0;
+				Menu3_SetTempThreshold();
+				break;
+			case 4:
+				Menu2_Select = 0;
+				Menu3_SetVoiceVolume();
+				break;
+			case 5:
+				Menu2_Select = 0;
+				CurrSelect2 = 1;
+				break;
+			case 6:
+				Menu2_Select = 0;
+				Menu3_SetSafeDistance();
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 各档位转速阈值设置三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_SetMotorSpeed(void){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect3 >= 1 && CurrSelect3 <= 4){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "1档转速: XX   ", OLED_8X16);
+				OLED_ShowString(0, 32, "2档转速: XX   ", OLED_8X16);
+				OLED_ShowString(0, 48, "3档转速: XX.   ", OLED_8X16);
+			}else if(CurrSelect3 >= 5 && CurrSelect3 <= 7){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "4档转速: XX   ", OLED_8X16);
+				OLED_ShowString(0, 32, "5档转速: XX   ", OLED_8X16);
+			}
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			if(CurrSelect3 >= 1 && CurrSelect3 <= 4){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				OLED_ClearArea(64, 48, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Motor_Speed_1, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Motor_Speed_2, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 48, Motor_Speed_3, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+				OLED_UpdateArea(64, 48, 48, 16);
+			}else if(CurrSelect3 >= 5 && CurrSelect3 <= 7){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Motor_Speed_4, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Motor_Speed_5, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+			}
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 7;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 7){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 2:
+				Menu3_Select = 0;
+				Menu4_SetMotorSpeed(1);
+				break;
+			case 3:
+				Menu3_Select = 0;
+				Menu4_SetMotorSpeed(2);
+				break;
+			case 4:
+				Menu3_Select = 0;
+				Menu4_SetMotorSpeed(3);
+				return;
+			case 5:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 6:
+				Menu3_Select = 0;
+				Menu4_SetMotorSpeed(4);
+				break;
+			case 7:
+				Menu3_Select = 0;
+				Menu4_SetMotorSpeed(5);
+				return;
+		}
+	}
+}
+
+/**
+  * @brief 各档位转速设置四级菜单
+  * @param 设置的温度阈值
+  * @retval 无
+  */
+void Menu4_SetMotorSpeed(uint8_t Gear_x){
+	uint8_t Menu4_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect4 >= 1 && CurrSelect4 <= 3){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "转速+1        ", OLED_8X16);
+				OLED_ShowString(0, 32, "转速-1        ", OLED_8X16);
+			}
+			OLED_ShowNum(0, 48, Gear_x, 1, OLED_8X16);
+			OLED_ShowString(8, 48, "档转速: XX            ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(64, 48, 48, 16); 
+			
+			switch(Gear_x){
+				case 1:OLED_ShowNum(64, 48, Motor_Speed_1, 2, OLED_8X16);break;
+				case 2:OLED_ShowNum(64, 48, Motor_Speed_2, 2, OLED_8X16);break;
+				case 3:OLED_ShowNum(64, 48, Motor_Speed_3, 2, OLED_8X16);break;
+				case 4:OLED_ShowNum(64, 48, Motor_Speed_4, 2, OLED_8X16);break;
+				case 5:OLED_ShowNum(64, 48, Motor_Speed_5, 2, OLED_8X16);break;
+			}
+
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(64, 48, 48, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect4--;
+			if(CurrSelect4 <= 0){
+				CurrSelect4 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect4++;
+			if(CurrSelect4 > 3){
+				CurrSelect4 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu4_Select = CurrSelect4;
+		}
+		
+		switch(Menu4_Select){
+			case 1:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				Voice_SetMotorSpeed();
+				BlueTooth_SetMotorSpeed();
+				return;
+			case 2:
+				Menu4_Select = 0;
+				Motor_Speed_Add(Gear_x);
+				break;
+			case 3:
+				Menu4_Select = 0;
+				Motor_Speed_Sub(Gear_x);
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 温度阈值设置三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_SetTempThreshold(void){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect3 >= 1 && CurrSelect3 <= 4){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "5档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 32, "4档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 48, "3档阈值: XX.X ℃   ", OLED_8X16);
+			}else if(CurrSelect3 >= 5 && CurrSelect3 <= 7){
+				OLED_ShowString(0, 0,  "<-             ", OLED_8X16);
+				OLED_ShowString(0, 16, "2档阈值: XX.X ℃   ", OLED_8X16);
+				OLED_ShowString(0, 32, "1档阈值: XX.X ℃   ", OLED_8X16);
+			}
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			if(CurrSelect3 >= 1 && CurrSelect3 <= 4){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				OLED_ClearArea(64, 48, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Temp_Gear_5, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Gear_4, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+				OLED_UpdateArea(64, 48, 48, 16);
+			}else if(CurrSelect3 >= 5 && CurrSelect3 <= 7){
+				OLED_ClearArea(64, 16, 48, 16);
+				OLED_ClearArea(64, 32, 48, 16);
+				
+				OLED_ShowFloatNum(64, 16, Temp_Gear_2, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Gear_1, 2, 1, OLED_8X16);
+				
+				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+				OLED_UpdateArea(64, 16, 48, 16);
+				OLED_UpdateArea(64, 32, 48, 16);
+			}
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 7;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 7){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 2:
+				Menu3_Select = 0;
+				Menu4_SetTempThreshold(5);
+				break;
+			case 3:
+				Menu3_Select = 0;
+				Menu4_SetTempThreshold(4);
+				break;
+			case 4:
+				Menu3_Select = 0;
+				Menu4_SetTempThreshold(3);
+				return;
+			case 5:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 6:
+				Menu3_Select = 0;
+				Menu4_SetTempThreshold(2);
+				break;
+			case 7:
+				Menu3_Select = 0;
+				Menu4_SetTempThreshold(1);
+				return;
+		}
+	}
+}
+
+/**
+  * @brief 温度阈值设置四级菜单
+  * @param 设置的温度阈值
+  * @retval 无
+  */
+void Menu4_SetTempThreshold(uint8_t TempThresHold_x){
+	uint8_t Menu4_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			if(CurrSelect4 >= 1 && CurrSelect4 <= 3){
+				OLED_ShowString(0, 0,  "<-           ", OLED_8X16);
+				OLED_ShowString(0, 16, "阈值+0.5        ", OLED_8X16);
+				OLED_ShowString(0, 32, "阈值-0.5        ", OLED_8X16);
+			}
+			OLED_ShowNum(0, 48, TempThresHold_x, 1, OLED_8X16);
+			OLED_ShowString(8, 48, "档阈值: XX.X ℃  ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(64, 48, 48, 16); 
+			
+			switch(TempThresHold_x){
+				case 1:OLED_ShowFloatNum(64, 48, Temp_Gear_1, 2, 1, OLED_8X16);break;
+				case 2:OLED_ShowFloatNum(64, 48, Temp_Gear_2, 2, 1, OLED_8X16);break;
+				case 3:OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);break;
+				case 4:OLED_ShowFloatNum(64, 48, Temp_Gear_4, 2, 1, OLED_8X16);break;
+				case 5:OLED_ShowFloatNum(64, 48, Temp_Gear_5, 2, 1, OLED_8X16);break;
+			}
+
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(64, 48, 48, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect4--;
+			if(CurrSelect4 <= 0){
+				CurrSelect4 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect4++;
+			if(CurrSelect4 > 3){
+				CurrSelect4 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu4_Select = CurrSelect4;
+		}
+		
+		switch(Menu4_Select){
+			case 1:
+				Menu4_Select = 0;
+				CurrSelect4 = 1;
+				Voice_SetTempThreshold();
+				BlueTooth_SetTempThreshold();
+				return;
+			case 2:
+				Menu4_Select = 0;
+				TempThreshold_Add(TempThresHold_x);
+				break;
+			case 3:
+				Menu4_Select = 0;
+				TempThreshold_Sub(TempThresHold_x);
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 设置语音音量三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_SetVoiceVolume(void){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			
+			OLED_ShowString(0, 0,  "<-   当前音量:     ", OLED_8X16);
+			OLED_ShowString(0, 16, "音量+1            ", OLED_8X16);
+			OLED_ShowString(0, 32, "音量-1            ", OLED_8X16);
+			OLED_ShowString(0, 48, "                 ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(120, 0, 8, 16);
+			OLED_ShowNum(120, 0, VoiceVolume, 1, OLED_8X16);
+			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(120, 0, 8, 16);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 3){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 2://音量+1
+				Menu3_Select = 0;
 				if(VoiceVolume < 7){
 					VoiceVolume++;
 					Voice_Volume_Up();
@@ -1538,12 +1801,88 @@ void Menu2_SetVoiceVolume(void){
 				}
 				break;
 			case 3://音量-1
-				Menu2_Select = 0;
+				Menu3_Select = 0;
 				if(VoiceVolume > 1){
 					VoiceVolume--;
 					Voice_Volume_Down();
 				}else{
 					Voice_Volume_Min();
+				}
+				break;
+		}
+	}
+}
+
+/**
+  * @brief 设置安全距离三级菜单
+  * @param 无
+  * @retval 无
+  */
+void Menu3_SetSafeDistance(void){
+	uint8_t Menu3_Select = 0;
+	
+	while(1){
+		if(CurrState == 0){
+			OLED_Clear();
+			
+			OLED_ShowString(0, 0,  "<- 当前距离:     ", OLED_8X16);
+			OLED_ShowString(0, 16, "安全距离+0.1cm   ", OLED_8X16);
+			OLED_ShowString(0, 32, "安全距离-0.1cm   ", OLED_8X16);
+			OLED_ShowString(0, 48, "安全距离:     cm ", OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_Update();
+			CurrState = 1;
+		}else{
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_ClearArea(88, 0, 40, 16);
+			OLED_ClearArea(64, 48, 40, 16);
+			
+			float Distance = HC_SR04_GetDistance();
+			OLED_ShowFloatNum(88, 0, Distance, 2, 1, OLED_8X16);
+			OLED_ShowFloatNum(64, 48, Safe_Distance, 2, 1, OLED_8X16);
+			OLED_ShowChar(88, 0, ':', OLED_8X16);
+			OLED_ShowChar(64, 48, ':', OLED_8X16);
+			
+			OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
+			OLED_UpdateArea(88, 0, 40, 16);
+			OLED_UpdateArea(64, 48, 40, 16);
+			
+			Delay_ms(100);
+		}
+		
+		if(Key_Check(KEY_1, KEY_SINGLE)){//上一项
+			CurrState = 0;
+			CurrSelect3--;
+			if(CurrSelect3 <= 0){
+				CurrSelect3 = 3;
+			}
+		}else if(Key_Check(KEY_2, KEY_SINGLE)){//下一项
+			CurrState = 0;
+			CurrSelect3++;
+			if(CurrSelect3 > 3){
+				CurrSelect3 = 1;
+			}
+		}else if(Key_Check(KEY_3, KEY_SINGLE | KEY_REPEAT)){//确认
+			CurrState = 0;
+			OLED_Clear();
+			OLED_Update();
+			Menu3_Select = CurrSelect3;
+		}
+		
+		switch(Menu3_Select){
+			case 1:
+				Menu3_Select = 0;
+				CurrSelect3 = 1;
+				return;
+			case 2://安全距离+0.1
+				Menu3_Select = 0;
+				Safe_Distance_Add();
+				break;
+			case 3://安全距离-0.1
+				Menu3_Select = 0;
+				if(Safe_Distance > 0){
+					Safe_Distance_Sub();
 				}
 				break;
 		}

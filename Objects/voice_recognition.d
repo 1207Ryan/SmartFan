@@ -30,7 +30,7 @@
 .\objects\voice_recognition.o: .\Library\misc.h
 .\objects\voice_recognition.o: Hardware\Serial.h
 .\objects\voice_recognition.o: .\System\Delay.h
-.\objects\voice_recognition.o: Hardware\Menu.h
+.\objects\voice_recognition.o: .\System\Menu.h
 .\objects\voice_recognition.o: Hardware\Motor.h
 .\objects\voice_recognition.o: .\System\MyRTC.h
 .\objects\voice_recognition.o: Hardware\AD.h

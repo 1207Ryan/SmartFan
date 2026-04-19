@@ -313,6 +313,7 @@ void Serial_Stop(uint8_t usartx){
 void Serial_SendPacket(uint8_t usartx, uint16_t length)
 {
 	Serial_Start(usartx);
+	Serial_Start(usartx);
 	Serial_SendArray(usartx, Serial_TxDataPacket, length);
 	Serial_Stop(usartx);
 }

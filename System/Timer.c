@@ -120,7 +120,7 @@ void TIM2_IRQHandler(void){
 		if(Working && refresh_tick % 200 == 0){
 			//200ms测量一次距离
 			current_dist = HC_SR04_GetDistance();
-			if(current_dist < SATE_DISTANCE){
+			if(current_dist < Safe_Distance){
 				IsSafe = 0;
 				
 				now_sec = MyRTC_GetCurrentSec(); // 获取当前秒数

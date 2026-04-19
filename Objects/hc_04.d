@@ -30,7 +30,7 @@
 .\objects\hc_04.o: .\Library\misc.h
 .\objects\hc_04.o: Hardware\Serial.h
 .\objects\hc_04.o: .\System\Delay.h
-.\objects\hc_04.o: Hardware\Menu.h
+.\objects\hc_04.o: .\System\Menu.h
 .\objects\hc_04.o: Hardware\Motor.h
 .\objects\hc_04.o: .\System\MyRTC.h
 .\objects\hc_04.o: Hardware\AD.h
