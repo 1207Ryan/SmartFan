@@ -9,19 +9,8 @@ extern uint8_t CurrSelect3;
 extern uint8_t CurrSelect4;
 extern uint8_t CurrState;
 
-extern uint8_t Motor_Speed_0;      // 0档对应电机转速
-extern uint8_t Motor_Speed_1;      // 1档对应电机转速
-extern uint8_t Motor_Speed_2;      // 2档对应电机转速
-extern uint8_t Motor_Speed_3;      // 3档对应电机转速
-extern uint8_t Motor_Speed_4;      // 4档对应电机转速
-extern uint8_t Motor_Speed_5;      // 5档对应电机转速
-
-extern float Temp_Gear_1;
-extern float Temp_Gear_2;
-extern float Temp_Gear_3;
-extern float Temp_Gear_4;
-extern float Temp_Gear_5;
-
+extern uint8_t Motor_Speed[6];      // 各档对应电机转速
+extern float Temp_Threshold[6];
 extern float Safe_Distance;
 
 uint8_t Menu1(void);

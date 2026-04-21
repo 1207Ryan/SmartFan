@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Sun Apr 19 21:32:19 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Apr 21 18:56:45 2026
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -997,7 +997,7 @@ Global Symbols
 <LI><a href="#[10b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu2_Music
 </UL>
 
-<P><STRONG><a name="[b4]"></a>BlueTooth_SetMotorSpeed</STRONG> (Thumb, 54 bytes, Stack size 16 bytes, hc_04.o(i.BlueTooth_SetMotorSpeed))
+<P><STRONG><a name="[b4]"></a>BlueTooth_SetMotorSpeed</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, hc_04.o(i.BlueTooth_SetMotorSpeed))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152 + Unknown Stack Size
 <LI>Call Chain = BlueTooth_SetMotorSpeed &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -1205,9 +1205,9 @@ Global Symbols
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Delay_ms
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_SendString
 <LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_ClearRxBuffer
+<LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strstr
 <LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sscanf
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ldivmod
-<LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strstr
 </UL>
 <BR>[Called By]<UL><LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu3_SetDateAndTime
 <LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Voice_Recognition
@@ -1224,8 +1224,8 @@ Global Symbols
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Weather_Parse
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_SendString
 <LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_ClearRxBuffer
-<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sscanf
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strstr
+<LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0sscanf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu2_Weather
 <LI><a href="#[181]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Voice_Recognition
@@ -1284,11 +1284,14 @@ Global Symbols
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSingleDistance
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_Stop
 <LI><a href="#[145]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SetSpeed
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
 
 <P><STRONG><a name="[df]"></a>GPIO_SetBits</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f10x_gpio.o(i.GPIO_SetBits))
-<BR><BR>[Called By]<UL><LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSingleDistance
+<BR><BR>[Called By]<UL><LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HC_SR04_Init
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetSingleDistance
 <LI><a href="#[145]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SetSpeed
+<LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
 
 <P><STRONG><a name="[173]"></a>GPIO_StructInit</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32f10x_gpio.o(i.GPIO_StructInit))
@@ -1339,6 +1342,7 @@ Global Symbols
 <LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_SendByte
 <LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_GetRxFlag
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_ClearTxBuffer
+<LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strcpy
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_fmul
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2f
@@ -1350,7 +1354,6 @@ Global Symbols
 <LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
 <LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
-<LI><a href="#[f4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strcpy
 </UL>
 <BR>[Called By]<UL><LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
@@ -1375,11 +1378,12 @@ Global Symbols
 <LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM2_IRQHandler
 </UL>
 
-<P><STRONG><a name="[fd]"></a>HC_SR04_Init</STRONG> (Thumb, 80 bytes, Stack size 8 bytes, hc_sr04.o(i.HC_SR04_Init))
+<P><STRONG><a name="[fd]"></a>HC_SR04_Init</STRONG> (Thumb, 126 bytes, Stack size 8 bytes, hc_sr04.o(i.HC_SR04_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = HC_SR04_Init &rArr; ECHO_EXTI_Init &rArr; GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM4_TimeInit
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ECHO_EXTI_Init
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_SetBits
 <LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ResetBits
 <LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_APB2PeriphClockCmd
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
@@ -1838,7 +1842,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu3_SetMotorSpeed
 </UL>
 
-<P><STRONG><a name="[12c]"></a>Menu4_SetTempThreshold</STRONG> (Thumb, 590 bytes, Stack size 40 bytes, menu.o(i.Menu4_SetTempThreshold))
+<P><STRONG><a name="[12c]"></a>Menu4_SetTempThreshold</STRONG> (Thumb, 430 bytes, Stack size 40 bytes, menu.o(i.Menu4_SetTempThreshold))
 <BR><BR>[Stack]<UL><LI>Max Depth = 256 + Unknown Stack Size
 <LI>Call Chain = Menu4_SetTempThreshold &rArr; OLED_ShowFloatNum &rArr; OLED_ShowNum &rArr; OLED_ShowChar &rArr; OLED_ShowImage &rArr; OLED_ClearArea
 </UL>
@@ -1892,7 +1896,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[eb]"></a>Motor_SetGear</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, motor.o(i.Motor_SetGear))
+<P><STRONG><a name="[eb]"></a>Motor_SetGear</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, motor.o(i.Motor_SetGear))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = Motor_SetGear &rArr; Motor_SetSpeed &rArr; PWM_SetCompare2
 </UL>
 <BR>[Calls]<UL><LI><a href="#[145]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SetSpeed
@@ -1914,15 +1918,15 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SetGear
 </UL>
 
-<P><STRONG><a name="[138]"></a>Motor_Speed_Add</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Add))
+<P><STRONG><a name="[138]"></a>Motor_Speed_Add</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Add))
 <BR><BR>[Called By]<UL><LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu4_SetMotorSpeed
 </UL>
 
-<P><STRONG><a name="[f9]"></a>Motor_Speed_Set</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Set))
+<P><STRONG><a name="[f9]"></a>Motor_Speed_Set</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Set))
 <BR><BR>[Called By]<UL><LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HC_04_Detect
 </UL>
 
-<P><STRONG><a name="[139]"></a>Motor_Speed_Sub</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Sub))
+<P><STRONG><a name="[139]"></a>Motor_Speed_Sub</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, motor.o(i.Motor_Speed_Sub))
 <BR><BR>[Called By]<UL><LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu4_SetMotorSpeed
 </UL>
 
@@ -2925,7 +2929,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
-<P><STRONG><a name="[2b]"></a>TIM2_IRQHandler</STRONG> (Thumb, 358 bytes, Stack size 16 bytes, timer.o(i.TIM2_IRQHandler))
+<P><STRONG><a name="[2b]"></a>TIM2_IRQHandler</STRONG> (Thumb, 378 bytes, Stack size 16 bytes, timer.o(i.TIM2_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 312 + Unknown Stack Size
 <LI>Call Chain = TIM2_IRQHandler &rArr; Voice_Recognition &rArr; ESP8266_GetWeather &rArr; __0sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_int
 </UL>
@@ -2934,6 +2938,8 @@ Global Symbols
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HC_SR04_GetDistance
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AD_to_Temp
 <LI><a href="#[101]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Key_Tick
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_SetBits
+<LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_ResetBits
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_Stop
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SetGear
 <LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HC_04_Detect
@@ -2952,7 +2958,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_md.o(RESET)
 </UL>
-<P><STRONG><a name="[2d]"></a>TIM4_IRQHandler</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, hc_sr04.o(i.TIM4_IRQHandler))
+<P><STRONG><a name="[2d]"></a>TIM4_IRQHandler</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, hc_sr04.o(i.TIM4_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = TIM4_IRQHandler &rArr; TIM_GetITStatus
 </UL>
 <BR>[Calls]<UL><LI><a href="#[17e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIM_GetITStatus
@@ -3037,7 +3043,7 @@ Global Symbols
 <LI><a href="#[183]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Timer_Init
 </UL>
 
-<P><STRONG><a name="[13b]"></a>TempThreshold_Add</STRONG> (Thumb, 176 bytes, Stack size 24 bytes, ad.o(i.TempThreshold_Add))
+<P><STRONG><a name="[13b]"></a>TempThreshold_Add</STRONG> (Thumb, 42 bytes, Stack size 24 bytes, ad.o(i.TempThreshold_Add))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = TempThreshold_Add &rArr; __aeabi_d2f
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
@@ -3047,11 +3053,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[12c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Menu4_SetTempThreshold
 </UL>
 
-<P><STRONG><a name="[f7]"></a>TempThreshold_Set</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, ad.o(i.TempThreshold_Set))
+<P><STRONG><a name="[f7]"></a>TempThreshold_Set</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, ad.o(i.TempThreshold_Set))
 <BR><BR>[Called By]<UL><LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HC_04_Detect
 </UL>
 
-<P><STRONG><a name="[13c]"></a>TempThreshold_Sub</STRONG> (Thumb, 176 bytes, Stack size 24 bytes, ad.o(i.TempThreshold_Sub))
+<P><STRONG><a name="[13c]"></a>TempThreshold_Sub</STRONG> (Thumb, 42 bytes, Stack size 24 bytes, ad.o(i.TempThreshold_Sub))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = TempThreshold_Sub &rArr; __aeabi_dsub
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d

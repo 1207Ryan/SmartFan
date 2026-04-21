@@ -15,11 +15,7 @@
 
 extern uint16_t AD_Value;
 
-extern float Temp_Gear_1;
-extern float Temp_Gear_2;
-extern float Temp_Gear_3;
-extern float Temp_Gear_4;
-extern float Temp_Gear_5;
+extern float Temp_Threshold[6];
 
 void AD_Init(void);
 void AD_Collect_Start(void);

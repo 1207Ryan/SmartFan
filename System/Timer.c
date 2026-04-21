@@ -21,6 +21,7 @@ extern volatile uint8_t Gear;
 extern volatile uint8_t Last_Gear;
 extern volatile uint8_t Temp2Gear;
 extern volatile float Temp;
+extern float Safe_Distance;
 extern uint8_t temp_int;
 extern uint8_t temp_dec;
 volatile uint8_t IsSafe = 1;
@@ -63,15 +64,15 @@ void Timer_Init(void){
 void Temp_Match_Gear(void){
 	if(Temp2Gear && IsSafe){
 		// 根据当前温度匹配档位
-		if(Temp >= Temp_Gear_5){
+		if(Temp >= Temp_Threshold[5]){
 			Gear = 5;
-		}else if(Temp >= Temp_Gear_4){
+		}else if(Temp >= Temp_Threshold[4]){
 			Gear = 4;
-		}else if(Temp >= Temp_Gear_3){
+		}else if(Temp >= Temp_Threshold[3]){
 			Gear = 3;
-		}else if(Temp >= Temp_Gear_2){
+		}else if(Temp >= Temp_Threshold[2]){
 			Gear = 2;
-		}else if(Temp >= Temp_Gear_1){
+		}else if(Temp >= Temp_Threshold[1]){
 			Gear = 1;
 		}else{
 			Gear = 0;
@@ -120,7 +121,8 @@ void TIM2_IRQHandler(void){
 		if(Working && refresh_tick % 200 == 0){
 			//200ms测量一次距离
 			current_dist = HC_SR04_GetDistance();
-			if(current_dist < Safe_Distance){
+			if(current_dist < Safe_Distance){//小于安全距离
+				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 				IsSafe = 0;
 				
 				now_sec = MyRTC_GetCurrentSec(); // 获取当前秒数
@@ -130,12 +132,13 @@ void TIM2_IRQHandler(void){
 					last_warn_sec = now_sec ; // 更新上次发送时间
 				}
 				
-				if(Gear > 0){
+				if(Gear > 0){//风扇停止
 					Last_Gear = Gear;
 					Gear = 0;
 					Motor_Stop();
 				}
 			}else{
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);
 				IsSafe = 1;
 				if(Gear == 0){
 					Gear = Last_Gear;

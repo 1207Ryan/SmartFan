@@ -21,18 +21,9 @@ uint8_t CurrSelect3 = 1;
 uint8_t CurrSelect4 = 1;
 uint8_t CurrState = 0;
 
-uint8_t Motor_Speed_0 = 0;       // 0档对应电机转速
-uint8_t Motor_Speed_1 = 20;      // 1档对应电机转速
-uint8_t Motor_Speed_2 = 40;      // 2档对应电机转速
-uint8_t Motor_Speed_3 = 60;      // 3档对应电机转速
-uint8_t Motor_Speed_4 = 80;      // 4档对应电机转速
-uint8_t Motor_Speed_5 = 100;     // 5档对应电机转速
+uint8_t Motor_Speed[6] = {0, 20,40,60,80,100};       // 各档对应电机转速
 
-float Temp_Gear_1 = 20.0f;  // 1档温度阈值
-float Temp_Gear_2 = 25.0f;  // 2档温度阈值
-float Temp_Gear_3 = 30.0f;  // 3档温度阈值
-float Temp_Gear_4 = 35.0f;  // 4档温度阈值
-float Temp_Gear_5 = 40.0f;  // 5档温度阈值
+float Temp_Threshold[6] = {0.0f, 20.0f, 25.0f, 30.0f, 35.0f, 40.0f};  // 各档温度阈值
 
 float Safe_Distance = 3.0f;  // 安全距离（单位cm）
 
@@ -131,10 +122,11 @@ uint8_t Menu1(void){
 				break;
 			case 8:
 				Menu1_Select = 0;
+				Menu2_Debug();
 				break;
 			case 9:
 				Menu1_Select = 0;
-				Menu2_Debug();
+				
 				break;
 		}
 	}
@@ -1410,9 +1402,9 @@ void Menu3_SetMotorSpeed(void){
 				OLED_ClearArea(64, 32, 48, 16);
 				OLED_ClearArea(64, 48, 48, 16);
 				
-				OLED_ShowFloatNum(64, 16, Motor_Speed_1, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Motor_Speed_2, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 48, Motor_Speed_3, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 16, Motor_Speed[1], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Motor_Speed[2], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 48, Motor_Speed[3], 2, 1, OLED_8X16);
 				
 				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
 				OLED_UpdateArea(64, 16, 48, 16);
@@ -1422,8 +1414,8 @@ void Menu3_SetMotorSpeed(void){
 				OLED_ClearArea(64, 16, 48, 16);
 				OLED_ClearArea(64, 32, 48, 16);
 				
-				OLED_ShowFloatNum(64, 16, Motor_Speed_4, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Motor_Speed_5, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 16, Motor_Speed[4], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Motor_Speed[5], 2, 1, OLED_8X16);
 				
 				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
 				OLED_UpdateArea(64, 16, 48, 16);
@@ -1510,11 +1502,11 @@ void Menu4_SetMotorSpeed(uint8_t Gear_x){
 			OLED_ClearArea(64, 48, 48, 16); 
 			
 			switch(Gear_x){
-				case 1:OLED_ShowNum(64, 48, Motor_Speed_1, 2, OLED_8X16);break;
-				case 2:OLED_ShowNum(64, 48, Motor_Speed_2, 2, OLED_8X16);break;
-				case 3:OLED_ShowNum(64, 48, Motor_Speed_3, 2, OLED_8X16);break;
-				case 4:OLED_ShowNum(64, 48, Motor_Speed_4, 2, OLED_8X16);break;
-				case 5:OLED_ShowNum(64, 48, Motor_Speed_5, 2, OLED_8X16);break;
+				case 1:OLED_ShowNum(64, 48, Motor_Speed[1], 2, OLED_8X16);break;
+				case 2:OLED_ShowNum(64, 48, Motor_Speed[2], 2, OLED_8X16);break;
+				case 3:OLED_ShowNum(64, 48, Motor_Speed[3], 2, OLED_8X16);break;
+				case 4:OLED_ShowNum(64, 48, Motor_Speed[4], 2, OLED_8X16);break;
+				case 5:OLED_ShowNum(64, 48, Motor_Speed[5], 2, OLED_8X16);break;
 			}
 
 			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
@@ -1590,9 +1582,9 @@ void Menu3_SetTempThreshold(void){
 				OLED_ClearArea(64, 32, 48, 16);
 				OLED_ClearArea(64, 48, 48, 16);
 				
-				OLED_ShowFloatNum(64, 16, Temp_Gear_5, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Temp_Gear_4, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 16, Temp_Threshold[5], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Threshold[4], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 48, Temp_Threshold[3], 2, 1, OLED_8X16);
 				
 				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
 				OLED_UpdateArea(64, 16, 48, 16);
@@ -1602,8 +1594,8 @@ void Menu3_SetTempThreshold(void){
 				OLED_ClearArea(64, 16, 48, 16);
 				OLED_ClearArea(64, 32, 48, 16);
 				
-				OLED_ShowFloatNum(64, 16, Temp_Gear_2, 2, 1, OLED_8X16);
-				OLED_ShowFloatNum(64, 32, Temp_Gear_1, 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 16, Temp_Threshold[2], 2, 1, OLED_8X16);
+				OLED_ShowFloatNum(64, 32, Temp_Threshold[1], 2, 1, OLED_8X16);
 				
 				OLED_ReverseArea(0, ((CurrSelect3 - 1)*16)%64, 128, 16);
 				OLED_UpdateArea(64, 16, 48, 16);
@@ -1688,14 +1680,8 @@ void Menu4_SetTempThreshold(uint8_t TempThresHold_x){
 		}else{
 			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
 			OLED_ClearArea(64, 48, 48, 16); 
-			
-			switch(TempThresHold_x){
-				case 1:OLED_ShowFloatNum(64, 48, Temp_Gear_1, 2, 1, OLED_8X16);break;
-				case 2:OLED_ShowFloatNum(64, 48, Temp_Gear_2, 2, 1, OLED_8X16);break;
-				case 3:OLED_ShowFloatNum(64, 48, Temp_Gear_3, 2, 1, OLED_8X16);break;
-				case 4:OLED_ShowFloatNum(64, 48, Temp_Gear_4, 2, 1, OLED_8X16);break;
-				case 5:OLED_ShowFloatNum(64, 48, Temp_Gear_5, 2, 1, OLED_8X16);break;
-			}
+
+			OLED_ShowFloatNum(64, 48, Temp_Threshold[TempThresHold_x], 2, 1, OLED_8X16);
 
 			OLED_ReverseArea(0, ((CurrSelect4 - 1)*16)%64, 128, 16);
 			OLED_UpdateArea(64, 48, 48, 16);

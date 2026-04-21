@@ -342,14 +342,14 @@ void BlueTooth_Stop_Countdown(void){
 
 void BlueTooth_SetMotorSpeed(void){
 	sprintf(Str, "1档转速:%d,2档转速:%d,3档转速:%d,4档转速:%d,5档转速:%d", 
-		Motor_Speed_1, Motor_Speed_2, Motor_Speed_3, Motor_Speed_4, Motor_Speed_5);
+		Motor_Speed[1], Motor_Speed[2], Motor_Speed[3], Motor_Speed[4], Motor_Speed[5]);
 	Serial_SendString(2, Str);
 	Serial_SendByte(2, '\n');
 }
 
 void BlueTooth_SetTempThreshold(void){
 	sprintf(Str, "1档温度阈值:%.1f,2档温度阈值:%.1f,3档温度阈值:%.1f,4档温度阈值:%.1f,5档温度阈值:%.1f", 
-		Temp_Gear_1, Temp_Gear_2, Temp_Gear_3, Temp_Gear_4, Temp_Gear_5);
+		Temp_Threshold[1], Temp_Threshold[2], Temp_Threshold[3], Temp_Threshold[4], Temp_Threshold[5]);
 	Serial_SendString(2, Str);
 	Serial_SendByte(2, '\n');
 }

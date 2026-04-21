@@ -25,18 +25,6 @@ static uint8_t g_WindowIndex = 0;
 #define MAX_ECHO_TIME 5800
 
 /**
- * @brief TIM4中断服务函数（1ms累加）
- */
-void TIM4_IRQHandler(void)
-{
-    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
-    {
-        g_Tim4MsCount++;                // 每1ms计数+1
-        TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
-    }
-}
-
-/**
  * @brief 初始化TIM4（1us计数+1ms中断，双重计时防溢出）
  */
 static void TIM4_TimeInit(void)
@@ -89,7 +77,7 @@ static void ECHO_EXTI_Init(void)
     NVIC_InitTypeDef NVIC_InitStruct;
     NVIC_InitStruct.NVIC_IRQChannel = EXTI4_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
     NVIC_Init(&NVIC_InitStruct);
 
@@ -102,7 +90,7 @@ static void ECHO_EXTI_Init(void)
 }
 
 /**
- * @brief 初始化HC-SR04（核心修复：分组移到main，校准参数）
+ * @brief 初始化HC-SR04
  */
 void HC_SR04_Init(void)
 {
@@ -114,19 +102,40 @@ void HC_SR04_Init(void)
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(TRIG_PORT, &GPIO_InitStruct);
     GPIO_ResetBits(TRIG_PORT, TRIG_PIN);
-
-    // 2. TIM4初始化（含中断）
+	
+	// 2. 板载LED初始化
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP; 
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+	GPIO_SetBits(GPIOC, GPIO_Pin_13);
+	
+    // 3. TIM4初始化（含中断）
     TIM4_TimeInit();
 
-    // 3. EXTI初始化
+    // 4. EXTI初始化
     ECHO_EXTI_Init();
 
-    // 4. 滑动窗口初始化
+    // 5. 滑动窗口初始化
     for(uint8_t i=0; i<WINDOW_SIZE; i++)
     {
         g_DistanceWindow[i] = 0.0f;
     }
     g_WindowIndex = 0;
+}
+
+/**
+ * @brief TIM4中断服务函数（1ms累加）
+ */
+void TIM4_IRQHandler(void)
+{
+    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+    {
+		if(g_Tim4MsCount < 60000)  // 加防溢
+            g_Tim4MsCount++;                // 每1ms计数+1
+        TIM_ClearITPendingBit(TIM4, TIM_IT_Update);
+    }
 }
 
 /**

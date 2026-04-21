@@ -13,8 +13,10 @@
 #include "ESP8266.h"
 
 /*
-STM32 PA9 - ASRPRO PB6/PA3
-STM32 PA10 - ASRPRO PB5/PA2
+STM32 PA9 - ASRPRO PA3
+STM32 PA10 - ASRPRO PA2
+ASRPRO PA5 - DFPlayer Rx
+ASRPRO PA6 - DFPlayer Tx
 0x01:开启温度调节	0x02:关闭温度调节	0x03:报温度
 0x11:升档	0x12:降档	0x13:报档位	0x14:距离过近提示
 0x2C:设置倒计时	依次说 小时：分钟：秒钟 每个块对应一个时间	0x2D:开始倒计时
