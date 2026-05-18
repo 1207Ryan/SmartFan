@@ -194,7 +194,7 @@ float AD_to_Temp(void)
     float raw_temp = temp_k - 273.15f;
     
     // 4. 温度校准（根据实测微调）
-    raw_temp += 0.0f;
+    raw_temp -= 5.0f;
     
     // 5. 滑动窗口平均（启动无延迟，运行平滑）
     Temp_Value = Temp_SlidingWindow(raw_temp);

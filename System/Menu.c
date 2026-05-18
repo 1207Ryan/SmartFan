@@ -47,8 +47,8 @@ uint8_t Menu1(void){
 		if(CurrState == 0){
 			OLED_Clear();
 			if(CurrSelect1 >= 1 && CurrSelect1 <= 4){
-				OLED_ShowString(0, 0,  "温度调节档位          	", OLED_8X16);
-				OLED_ShowString(0, 16, "风扇档位控制          	", OLED_8X16);
+				OLED_ShowString(0, 0,  "自动模式          	", OLED_8X16);
+				OLED_ShowString(0, 16, "手动模式          	", OLED_8X16);
 				OLED_ShowString(0, 32, "倒计时               	", OLED_8X16);
 				OLED_ShowString(0, 48, "时间显示            	", OLED_8X16);
 			}
@@ -94,11 +94,11 @@ uint8_t Menu1(void){
 		switch(Menu1_Select){
 			case 1:
 				Menu1_Select = 0;
-				Menu2_Temp();
+				Menu2_Automatic();
 				break;
 			case 2:
 				Menu1_Select = 0;
-				Menu2_Fan();
+				Menu2_Manual();
 				break;
 			case 3:
 				Menu1_Select = 0;
@@ -137,14 +137,14 @@ uint8_t Menu1(void){
   * @param	无
   * @retval 无
   */
-void Menu2_Temp(){
+void Menu2_Automatic(){
 	uint8_t Menu2_Select = 0;
 
 	while(1){
 		if(CurrState == 0){
 			OLED_Clear();
 			OLED_ShowString(0, 0,  "<-         ℃ 档", OLED_8X16);
-			OLED_ShowString(0, 16, "启动温度调节档位  ", OLED_8X16);
+			OLED_ShowString(0, 16, "启动自动模式     ", OLED_8X16);
 			OLED_ShowString(0, 32, "停止风扇        ", OLED_8X16);
 			OLED_ShowString(0, 48, "              ", OLED_8X16);
 			
@@ -199,7 +199,7 @@ void Menu2_Temp(){
 			case 1:
 				Menu2_Select = 0;
 				return;
-			case 2:		//启动温度调节档位
+			case 2:		//启动自动模式
 				AD_Collect_Start();
 				Working = 1;
 				Temp2Gear = 1;
@@ -218,6 +218,7 @@ void Menu2_Temp(){
 				Motor_Stop();
 				Voice_Fan_Off();//Serial_SendByte(1, 0x02);
 				BlueTooth_Fan_Off();
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);
 				Menu2_Select = 0;
 				break;
 		}
@@ -229,7 +230,7 @@ void Menu2_Temp(){
   * @param 无
   * @retval 无
   */
-void Menu2_Fan(void){
+void Menu2_Manual(void){
 	uint8_t Menu2_Select = 0;
 
 	while(1){

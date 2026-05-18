@@ -14,8 +14,8 @@ extern float Temp_Threshold[6];
 extern float Safe_Distance;
 
 uint8_t Menu1(void);
-void Menu2_Temp(void);
-void Menu2_Fan(void);
+void Menu2_Automatic(void);
+void Menu2_Manual(void);
 void Menu2_CountDown(void);
 void Menu2_Clock(void);
 void Menu2_Weather(void);

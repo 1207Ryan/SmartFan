@@ -312,9 +312,16 @@ void Serial_Stop(uint8_t usartx){
 
 void Serial_SendPacket(uint8_t usartx, uint16_t length)
 {
+	uint8_t sum = 0;
+    for (uint16_t i = 0; i < length; i++)
+    {
+        sum += Serial_TxDataPacket[i]; // 计算累加校验和
+    }
+	
 	Serial_Start(usartx);
 	Serial_Start(usartx);
 	Serial_SendArray(usartx, Serial_TxDataPacket, length);
+	Serial_SendByte(usartx, sum);
 	Serial_Stop(usartx);
 }
 
@@ -372,7 +379,29 @@ void USART1_IRQHandler(void)
 		}else if(RxData == 0xFF){
 			Serial1_RxLen = 0;
 		}else if(RxData == 0xFE){
-			Serial1_RxFlag = 1;
+			if (Serial1_RxLen >= 1)
+            {
+                // 最后一个字节是校验和
+                uint8_t recv_sum = Serial1_RxDataPacket[Serial1_RxLen - 1];
+                uint8_t calc_sum = 0;
+
+                // 计算除校验位外所有数据的和
+                for (int i = 0; i < Serial1_RxLen - 1; i++)
+                {
+                    calc_sum += Serial1_RxDataPacket[i];
+                }
+
+                // 校验成功才标记接收完成
+                if (calc_sum == recv_sum)
+                {
+                    Serial1_RxFlag = 1;
+                }
+                else
+                {
+                    // 校验失败 → 丢弃这帧
+                    Serial1_RxLen = 0;
+                }
+            }
 		}else{
 			Serial1_RxDataPacket[Serial1_RxLen] = RxData;
 			Serial1_RxLen++;
@@ -397,7 +426,29 @@ void USART2_IRQHandler(void)
 		}else if(RxData == 0xFF){
 			Serial2_RxLen = 0;
 		}else if(RxData == 0xFE){
-			Serial2_RxFlag = 1;
+			if (Serial2_RxLen >= 1)
+            {
+                // 最后一个字节是校验和
+                uint8_t recv_sum = Serial2_RxDataPacket[Serial2_RxLen - 1];
+                uint8_t calc_sum = 0;
+
+                // 计算除校验位外所有数据的和
+                for (int i = 0; i < Serial2_RxLen - 1; i++)
+                {
+                    calc_sum += Serial2_RxDataPacket[i];
+                }
+
+                // 校验成功才标记接收完成
+                if (calc_sum == recv_sum)
+                {
+                    Serial2_RxFlag = 1;
+                }
+                else
+                {
+                    // 校验失败 → 丢弃这帧
+                    Serial2_RxLen = 0;
+                }
+            }
 		}else{
 			Serial2_RxDataPacket[Serial2_RxLen] = RxData;
 			Serial2_RxLen++;

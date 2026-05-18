@@ -122,7 +122,7 @@ void TIM2_IRQHandler(void){
 			//200ms测量一次距离
 			current_dist = HC_SR04_GetDistance();
 			if(current_dist < Safe_Distance){//小于安全距离
-				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+				GPIO_ResetBits(GPIOC, GPIO_Pin_13);//亮灯
 				IsSafe = 0;
 				
 				now_sec = MyRTC_GetCurrentSec(); // 获取当前秒数
@@ -138,7 +138,7 @@ void TIM2_IRQHandler(void){
 					Motor_Stop();
 				}
 			}else{
-				GPIO_SetBits(GPIOC, GPIO_Pin_13);
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);//灭灯
 				IsSafe = 1;
 				if(Gear == 0){
 					Gear = Last_Gear;
